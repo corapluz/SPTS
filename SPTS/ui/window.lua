@@ -24,8 +24,8 @@ local Tabs = {
     Nav     = Window:CreateTab("Teleports", "compass"),
     Equip   = Window:CreateTab("Equipment", "dumbbell"),
     Util    = Window:CreateTab("Utilities", "wrench"),
-    Theme   = Window:CreateTab("Themes",    "palette"),
     Players = Window:CreateTab("Players",   "users"),
+    Theme   = Window:CreateTab("Themes",    "palette"),
 }
 
 _G.RayfieldWindow = Window

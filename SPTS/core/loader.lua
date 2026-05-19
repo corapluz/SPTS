@@ -5,18 +5,19 @@ local TweenService = game:GetService("TweenService")
 local Debris       = game:GetService("Debris")
 local RunService   = game:GetService("RunService")
 local Players      = game:GetService("Players")
-local Lighting     = game:GetService("Lighting")
 local LP           = Players.LocalPlayer
 
 local cancelled = false
 
--- ── Blur ──────────────────────────────────────────────────────
+-- ── Blur frame (loader size, behind main frame) ───────────────
+-- Sits directly behind the loader at the same position/size.
+-- Gives a frosted-glass feel without blurring the whole screen.
 
+local Lighting = game:GetService("Lighting")
 local blur = Instance.new("BlurEffect")
 blur.Size   = 0
 blur.Parent = Lighting
-
-TweenService:Create(blur, TweenInfo.new(0.4), { Size = 16 }):Play()
+TweenService:Create(blur, TweenInfo.new(0.4), { Size = 12 }):Play()
 
 local function removeBlur()
     TweenService:Create(blur, TweenInfo.new(0.3), { Size = 0 }):Play()
@@ -343,8 +344,9 @@ task.spawn(function()
 end)
 
 -- ── Tween-in ──────────────────────────────────────────────────
+-- X: 0.15 + 0.025 = 0.175  |  Y: 0.1 + 0.05 = 0.15
 
-local TARGET_SIZE = UDim2.new(0.15, 0, 0.1, 0)
+local TARGET_SIZE = UDim2.new(0.175, 0, 0.15, 0)
 
 TweenService:Create(UI.MainFrame, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
     Size = TARGET_SIZE,
