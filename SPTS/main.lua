@@ -22,12 +22,12 @@ _G.ExecutorName = executorName
 -- ── Module loader ─────────────────────────────────────────────
 
 local function load(path)
-    local src, httpErr = pcall(function() return game:HttpGet(BASE .. path) end)
-    if not src then
+    local ok1, src = pcall(function() return game:HttpGet(BASE .. path) end)
+    if not ok1 then
         if _G.Loader then _G.Loader.error("HttpGet failed: " .. path) end
-        error("[SPTS] HttpGet failed for " .. path .. ": " .. tostring(httpErr))
+        error("[SPTS] HttpGet failed for " .. path .. ": " .. tostring(src))
     end
-    local fn, err = loadstring(httpErr, "@" .. path)
+    local fn, err = loadstring(src, "@" .. path)
     if not fn then
         if _G.Loader then _G.Loader.error("Parse error: " .. path) end
         error("[SPTS] loadstring failed for " .. path .. ": " .. tostring(err))
@@ -56,10 +56,10 @@ _G.Z = load("Module.lua");     step("Module.lua")
 
 getgenv().RAYFIELD_ASSET_ID = 10804731440
 _G.Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-step("Rayfield UI")loadBar("Rayfield UI")
+step("Rayfield UI")
 
-load("core/state.lua");        loadBar("State")
-load("core/services.lua");     loadBar("Services")
+load("core/state.lua");        step("State")
+load("core/services.lua");     step("Services")
 
 -- Redefine helpers to plain print until a custom console is provided.
 cprint = function(msg) print(msg) end
@@ -77,8 +77,8 @@ _G.doRespawn = function()
     Remote:FireServer(RESPAWN_PAYLOAD)
 end
 
-load("core/stats.lua");        loadBar("Stats sniffer")
-load("core/exploit_check.lua"); loadBar("Exploit check")
+load("core/stats.lua");         step("Stats sniffer")
+load("core/exploit_check.lua"); step("Exploit check")
 load("core/gui_utils.lua");    step("GUI utils")
 
 _G.Toggles     = {}
