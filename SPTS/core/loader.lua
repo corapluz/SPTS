@@ -344,7 +344,7 @@ end)
 
 -- ── Tween-in ──────────────────────────────────────────────────
 
-local TARGET_SIZE = UDim2.new(0.25, 0, 0.2, 0)
+local TARGET_SIZE = UDim2.new(0.15, 0, 0.1, 0)
 
 TweenService:Create(UI.MainFrame, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
     Size = TARGET_SIZE,
@@ -364,24 +364,23 @@ local function orange(t) return colored(t, 255, 140, 40)  end
 local function yellow(t) return colored(t, 255, 210, 60)  end
 
 local function buildStatusText(label)
-    if label:sub(1,2) == "✓ " or label:find("— supported") then
-        local name = label:gsub("✓%s*",""):gsub("%s*%-%-%s*supported","")
-        return green("✓ ") .. white(name) .. gray(" — supported")
-    elseif label:sub(1,2) == "✗ " or label:find("not available") or label:find("NOT") then
-        local name = label:gsub("[✗⚠]%s*",""):gsub("%s*%-%-%s*.*","")
-        return red("✗ ") .. white(name) .. yellow(" — not available")
+    -- Use ASCII symbols to avoid broken characters on some executors
+    if label:find("supported") then
+        local name = label:gsub("%s*%-%-%s*supported","")
+        return green("[OK] ") .. white(name) .. gray(" - supported")
+    elseif label:find("not available") or label:find("NOT") then
+        local name = label:gsub("%s*%-%-%s*.*","")
+        return red("[!!] ") .. white(name) .. yellow(" - not available")
     elseif label:find("ClientPlrData") and label:find("ready") and not label:find("not") then
-        return green("✓ ") .. white("ClientPlrData") .. gray(" — ready")
+        return green("[OK] ") .. white("ClientPlrData") .. gray(" - ready")
     elseif label:find("ClientPlrData") and (label:find("not ready") or label:find("still not")) then
-        return yellow("⚠ ") .. white("ClientPlrData") .. red(" — not ready")
-    elseif label:find("Error") or label:find("failed") or label:find("error") then
-        return red("✗ Error: ") .. white(label:gsub("[Ee]rror[: ]*",""):sub(1, 60))
+        return yellow("[??] ") .. white("ClientPlrData") .. red(" - not ready")
+    elseif label:find("[Ee]rror") or label:find("failed") then
+        return red("[!!] ") .. white(label:gsub("[Ee]rror[: ]*",""):sub(1, 55))
     elseif label == "Ready!" then
-        return green("✓ ") .. white("All systems ") .. green("ready!")
+        return green("[OK] ") .. white("All systems ") .. green("ready!")
     elseif label:find("Initializing") or label:find("modules") then
-        return gray("Initializing ") .. white("SPTS") .. gray("...")
-    elseif label:find("Loading") then
-        return gray("Loading ") .. orange(label:gsub("Loading%s*","")) .. gray("...")
+        return gray("Starting ") .. white("SPTS") .. gray("...")
     else
         return gray("Loading ") .. orange(label) .. gray("...")
     end
@@ -393,12 +392,15 @@ local TOTAL_STEPS = 18
 local currentStep = 0
 
 local function setStatus(text)
-    TweenService:Create(UI.Status, TweenInfo.new(0.1), { TextTransparency = 1 }):Play()
-    task.wait(0.12)
-    if UI.Status and UI.Status.Parent then
-        UI.Status.Text = buildStatusText(text)
-        TweenService:Create(UI.Status, TweenInfo.new(0.15), { TextTransparency = 0 }):Play()
-    end
+    -- Run fade in a separate thread so step() doesn't block loading
+    task.spawn(function()
+        TweenService:Create(UI.Status, TweenInfo.new(0.08), { TextTransparency = 1 }):Play()
+        task.wait(0.09)
+        if UI.Status and UI.Status.Parent then
+            UI.Status.Text = buildStatusText(text)
+            TweenService:Create(UI.Status, TweenInfo.new(0.12), { TextTransparency = 0 }):Play()
+        end
+    end)
 end
 
 local function step(label)

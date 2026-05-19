@@ -74,7 +74,7 @@ _G.doRespawn = function()
     local char = LP.Character
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if root then savedRespawnPos = root.Position end
-    Remote:FireServer(RESPAWN_PAYLOAD)
+    _G.Remote:FireServer(RESPAWN_PAYLOAD)
 end
 
 load("core/stats.lua");         step("Stats sniffer")
