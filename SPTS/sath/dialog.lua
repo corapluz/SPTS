@@ -159,7 +159,9 @@ local function runSathDialog()
         return false
     end
 
-    print("[SPTS] QuestTalkBtn visible, clicking...")
+    print("[SPTS] QuestTalkBtn visible, waiting for tween to settle...")
+    task.wait(0.6)  -- QuestTalkBtn tweens in from top, wait for it to land
+    print("[SPTS] Clicking QuestTalkBtn at " .. tostring(talkBtn.AbsolutePosition))
     clickBtn(talkBtn)
     task.wait(0.9)
 
@@ -218,7 +220,8 @@ local function tryAdvanceSathQuest()
 
     local talkBtn = sg:FindFirstChild("QuestTalkBtn")
     if talkBtn and talkBtn.Visible then
-        print("[SPTS] tryAdvanceSathQuest: talk button already visible")
+        print("[SPTS] tryAdvanceSathQuest: talk button already visible, waiting for tween...")
+        task.wait(0.6)
         return runTalkFlow()
     end
 
@@ -235,7 +238,8 @@ local function tryAdvanceSathQuest()
 
         talkBtn = sg:FindFirstChild("QuestTalkBtn")
         if talkBtn and talkBtn.Visible then
-            print("[SPTS] tryAdvanceSathQuest: talk button appeared")
+            print("[SPTS] tryAdvanceSathQuest: talk button appeared, waiting for tween...")
+            task.wait(0.6)
             return runTalkFlow()
         end
 
