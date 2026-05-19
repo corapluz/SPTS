@@ -77,20 +77,11 @@ loadBar("Rayfield UI")
 
 load("core/state.lua");        loadBar("State")
 load("core/services.lua");     loadBar("Services")
-load("core/console.lua")       -- RichText colored print — must be before exploit_check
 
--- Redefine helpers to use RichText colors now that console.lua is loaded.
-cprint = function(msg) _G.cprintGreen(msg)  end
-cwarn  = function(msg) _G.cprintRed(msg)    end
-cinfo  = function(msg) _G.cprintGray(msg)   end
-
--- Re-print executor detection with color now that console is ready.
-do
-    local execLower = executorName:lower()
-    if execLower:find("solara") or execLower:find("xeno") then
-        cprint("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
-    end
-end
+-- Redefine helpers to plain print until a custom console is provided.
+cprint = function(msg) print(msg) end
+cwarn  = function(msg) warn(msg)  end
+cinfo  = function(msg) print(msg) end
 
 local LP              = _G.LP
 local RESPAWN_PAYLOAD = { [1] = "Respawn" }
