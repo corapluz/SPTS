@@ -5,35 +5,6 @@ repeat task.wait(0.5) until game.IsLoaded
 
 local BASE = "https://raw.githubusercontent.com/corapluz/SPTS/refs/heads/main/SPTS/"
 
--- ── Console helpers ───────────────────────────────────────────
--- Loaded before everything else so all modules can use colored output.
--- _G.cprint, _G.cprintGreen etc. are defined in core/console.lua.
--- For now use plain print until console.lua is loaded.
-local function cprint(msg)  print(msg) end
-local function cwarn(msg)   warn(msg)  end
-local function cinfo(msg)   print(msg) end
-
--- Loading bar: prints ONE line per step, no spam.
--- steps = total number of steps, current = which step just finished.
-local LOAD_STEPS = 18
-local loadStep   = 0
-
-local function loadBar(label)
-    loadStep = loadStep + 1
-    local filled = math.floor((loadStep / LOAD_STEPS) * 10)
-    local empty  = 10 - filled
-    local bar    = "[" .. string.rep("=", filled) .. string.rep(" ", empty) .. "]"
-    local pct    = math.floor((loadStep / LOAD_STEPS) * 100)
-    local line   = string.format("[SPTS] %s %d%%  %s", bar, pct, label)
-    if loadStep >= LOAD_STEPS and _G.cprintGreen then
-        _G.cprintGreen(line)
-    elseif _G.cprintGray then
-        _G.cprintGray(line)
-    else
-        print(line)
-    end
-end
-
 -- ── Executor detection ────────────────────────────────────────
 
 local executorName = "Unknown"
@@ -45,16 +16,8 @@ elseif getexecutorname then
     if ok and name then executorName = tostring(name) end
 end
 
--- Strip version numbers and extra info — keep only the executor name.
--- "Solara 3.0" → "Solara", "Xeno 2.1.4 Beta" → "Xeno"
 executorName = executorName:match("^(%a[%a%d]*)") or executorName
-
 _G.ExecutorName = executorName
-
-local execLower = executorName:lower()
-if execLower:find("solara") or execLower:find("xeno") then
-    print("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
-end
 
 -- ── Module loader ─────────────────────────────────────────────
 
@@ -65,15 +28,23 @@ local function load(path)
     return fn()
 end
 
+-- ── Loader UI ─────────────────────────────────────────────────
+
+load("core/loader.lua")  -- creates _G.Loader with .step() and .finish()
+
+local function step(label)
+    if _G.Loader then _G.Loader.step(label) end
+end
+
 -- ── Boot sequence ─────────────────────────────────────────────
 
-print("[SPTS] ── Starting SPTS ──────────────────────────")
+_G.Loader.status("Loading modules...")
 
-_G.Z = load("Module.lua");     loadBar("Module.lua")
+_G.Z = load("Module.lua");     step("Module.lua")
 
 getgenv().RAYFIELD_ASSET_ID = 10804731440
 _G.Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-loadBar("Rayfield UI")
+step("Rayfield UI")loadBar("Rayfield UI")
 
 load("core/state.lua");        loadBar("State")
 load("core/services.lua");     loadBar("Services")
@@ -96,24 +67,24 @@ end
 
 load("core/stats.lua");        loadBar("Stats sniffer")
 load("core/exploit_check.lua"); loadBar("Exploit check")
-load("core/gui_utils.lua");    loadBar("GUI utils")
+load("core/gui_utils.lua");    step("GUI utils")
 
 _G.Toggles     = {}
 _G.cascadeLock = false
 
-load("ui/window.lua");         loadBar("Window")
-load("ui/toggle_sync.lua");    loadBar("Toggle sync")
+load("ui/window.lua");         step("Window")
+load("ui/toggle_sync.lua");    step("Toggle sync")
 
-load("sath/quest_defs.lua");   loadBar("Quest defs")
-load("sath/scanner.lua");      loadBar("Scanner")
-load("sath/farm.lua");         loadBar("Farm")
-load("sath/dialog.lua");       loadBar("Dialog")
+load("sath/quest_defs.lua");   step("Quest defs")
+load("sath/scanner.lua");      step("Scanner")
+load("sath/farm.lua");         step("Farm")
+load("sath/dialog.lua");       step("Dialog")
 
-load("training/tools.lua");    loadBar("Tools")
+load("training/tools.lua");    step("Tools")
 load("training/fist.lua")
 load("training/body.lua")
 load("training/mobility.lua")
-load("training/psychic.lua");  loadBar("Training loops")
+load("training/psychic.lua");  step("Training loops")
 
 -- ── Character events ──────────────────────────────────────────
 
@@ -188,7 +159,7 @@ if LP.Character and _G.bodyModule then
     _G.bodyModule.bindCharacterEvents(LP.Character)
 end
 
-load("players/esp.lua");       loadBar("ESP")
+load("players/esp.lua");       step("ESP")
 load("players/kill.lua")
 
 load("ui/dashboard_tab.lua")
@@ -197,9 +168,9 @@ load("ui/nav_tab.lua")
 load("ui/equip_tab.lua")
 load("ui/util_tab.lua")
 load("ui/theme_tab.lua")
-load("ui/players_tab.lua");    loadBar("UI tabs")
+load("ui/players_tab.lua");    step("UI tabs")
 
-load("sath/loop.lua");         loadBar("Sath loop")
+load("sath/loop.lua");         step("Sath loop")
 
 _G.Rayfield:LoadConfiguration()
 
@@ -211,4 +182,4 @@ if _G.Settings.AutoSathQuest and _G.setTrainingUiLocked then
     _G.setTrainingUiLocked(true)
 end
 
-cprint("[SPTS] ══ Loaded successfully ══════════════════")
+_G.Loader.finish()
