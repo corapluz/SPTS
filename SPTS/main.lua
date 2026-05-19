@@ -1,6 +1,8 @@
 -- SPTS main entry point.
 -- All modules are fetched from GitHub and executed via loadstring.
 
+repeat task.wait(0.5) until game.IsLoaded
+
 local BASE = "https://raw.githubusercontent.com/corapluz/SPTS/refs/heads/main/SPTS/"
 
 -- ── Console helpers ───────────────────────────────────────────
