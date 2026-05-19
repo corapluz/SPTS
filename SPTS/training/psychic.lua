@@ -59,7 +59,10 @@ end
 -- ── Double jump to enter fly ──────────────────────────────────
 
 local function doJump()
-    pcall(function() UserInputService:JumpRequest() end)
+    local vim = game:GetService("VirtualInputManager")
+    vim:SendKeyEvent(true,  Enum.KeyCode.Space, false, game)
+    task.wait(0.05)
+    vim:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
 end
 
 local function getHumAndRoot()
@@ -74,49 +77,17 @@ local function tryEnterFlyMode()
     local hum, root = getHumAndRoot()
     if not hum or not root or hum.Health <= 0 then return false end
 
-    -- Step 1: get airborne if on ground
-    if hum.FloorMaterial ~= Enum.Material.Air then
-        doJump()
-        local t0 = tick()
-        while tick() - t0 < 1.5 do
-            if hum:GetState() == Enum.HumanoidStateType.Freefall then break end
-            task.wait(0.05)
-        end
-    end
+    -- First Space press — jump
+    doJump()
+    task.wait(0.8)
+    -- Second Space press — activates fly while in freefall
+    doJump()
 
-    -- Step 2: in Freefall — set CanFly=true (game global) then jump to activate fly
-    if hum:GetState() == Enum.HumanoidStateType.Freefall then
-        -- CanFly is a game global set in Freefall state — we can also set it directly
-        pcall(function() CanFly = true end)
+    -- Wait for _G.Flying to become true
+    local t0 = tick()
+    while tick() - t0 < 1.5 do
+        if _G.isFlying() then return true end
         task.wait(0.05)
-        doJump()
-        local t0 = tick()
-        while tick() - t0 < 1.5 do
-            if _G.isFlying() then return true end
-            task.wait(0.05)
-        end
-    end
-
-    -- Still not flying — TP 50 units up, wait for Freefall, try once more
-    root.CFrame = CFrame.new(root.Position + Vector3.new(0, 50, 0))
-    task.wait(0.1)
-    hum, root = getHumAndRoot()
-    if hum and root then
-        local t0 = tick()
-        while tick() - t0 < 1.5 do
-            if hum:GetState() == Enum.HumanoidStateType.Freefall then break end
-            task.wait(0.05)
-        end
-        if hum:GetState() == Enum.HumanoidStateType.Freefall then
-            pcall(function() CanFly = true end)
-            task.wait(0.05)
-            doJump()
-            local t0b = tick()
-            while tick() - t0b < 1.5 do
-                if _G.isFlying() then return true end
-                task.wait(0.05)
-            end
-        end
     end
 
     return _G.isFlying()
