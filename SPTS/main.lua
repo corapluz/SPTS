@@ -73,8 +73,39 @@ load("training/psychic.lua") -- _G.stopFlyMode, _G.isFlying, _G.hasMeditateEquip
 
 -- ── Character events ──────────────────────────────────────────
 
+-- After every respawn, click the IntroGui "SPAWN" button automatically
+-- so the death screen doesn't block the Sath quest loop.
+local function dismissIntroGui()
+    local playerGui = LP:FindFirstChild("PlayerGui")
+    if not playerGui then return end
+    local introGui = playerGui:FindFirstChild("IntroGui")
+    if not introGui or not introGui.Enabled then return end
+
+    -- Wait for the button text to change from "Loading..." to "SPAWN".
+    local playBtn = introGui:FindFirstChild("PlayBtn")
+    if not playBtn then return end
+
+    local deadline = tick() + 10
+    while tick() < deadline do
+        if playBtn.Text == " SPAWN " or playBtn.Text == "PLAY" then break end
+        task.wait(0.2)
+    end
+
+    -- Click it.
+    _G.guiUtils.fireGuiSignal(playBtn)
+
+    -- Wait for the GUI to disappear before resuming farm logic.
+    deadline = tick() + 8
+    while tick() < deadline and introGui.Enabled do
+        task.wait(0.2)
+    end
+end
+
 LP.CharacterAdded:Connect(function(char)
     _G.ppTeleported = false
+
+    -- Dismiss the death/spawn screen first so loops aren't blocked.
+    task.spawn(dismissIntroGui)
 
     if savedRespawnPos then
         local pos = savedRespawnPos

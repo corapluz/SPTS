@@ -61,8 +61,8 @@ M.FS = {
     { req = 1e13, name = "Red Star (10T+)",    p1 = Vector3.new(-367, 15735, -11) },
     { req = 1e11, name = "Green Star (100B+)", p1 = Vector3.new(1380, 9274, 1648) },
     { req = 1e9,  name = "Blue Star (1B+)",   p1 = Vector3.new(1176, 4789, -2293) },
-    { req = 0,    name = "Crystal Zone",      p1 = Vector3.new(-2278, 1943, 1052) },
-    { req = 0,    name = "Rock Zone",         p1 = Vector3.new(433, 249, 991) },
+    { req = 0,    name = "Crystal Zone",      p1 = Vector3.new(-2278, 1943, 1052) }, -- unlocks after 9th quest finished
+    { req = 0,    name = "Rock Zone",         p1 = Vector3.new(433, 249, 991) }, -- unlocks after 3rd quest finished
 }
 
 -- ── Psychic Power Zones ───────────────────────────────────────
