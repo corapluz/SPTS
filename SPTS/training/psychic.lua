@@ -20,9 +20,6 @@ local flyStatusSynced = false
 
 local function setFlyStatus(on)
     flyStatusSynced = on == true
-    pcall(function()
-        Remote:FireServer({ "Update_Flying_Status", flyStatusSynced })
-    end)
 end
 
 _G.isFlying = function()
@@ -142,7 +139,11 @@ _G.stopFlyMode = function()
     end
     unequipMeditateTool()
     waitUntilMeditateGone(2)
-    if _G.isFlying() then pressSpace(); task.wait(0.25) end
+    if _G.isFlying() then
+        -- Press jump again to exit fly mode (same key that entered it)
+        pcall(function() UserInputService:JumpRequest() end)
+        task.wait(0.3)
+    end
     setFlyStatus(false)
     _G.Flying = false
 end
@@ -152,10 +153,6 @@ local function tryEnterFlyMode()
 
     local chapter = _G.sathScanner.readMainQuestChapterFromUI()
     if not Z.canFlyMeditateFarm(chapter, _G.RawStats) then return false end
-
-    -- Enable flight setting on the server and wait for it to propagate.
-    pcall(function() Remote:FireServer({ "Setting", "ToggleFlight", true }) end)
-    task.wait(0.3)
 
     local char = LP.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
