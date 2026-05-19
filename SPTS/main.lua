@@ -1,10 +1,50 @@
 -- SPTS main entry point.
 -- All modules are fetched from GitHub and executed via loadstring.
--- No script.Parent / require() calls — everything shares state through _G.
 
 local BASE = "https://raw.githubusercontent.com/corapluz/SPTS/refs/heads/main/SPTS/"
 
--- Fetches and runs a file from the repo. Errors loudly so bad URLs are obvious.
+-- ── Console helpers ───────────────────────────────────────────
+-- Roblox F9 doesn't support ANSI colors, but warn() = yellow, print() = white.
+-- We prefix with colored tags using Unicode blocks for visual separation.
+
+local function cprint(msg)  print("\27[32m" .. msg .. "\27[0m") end  -- green (some executors support ANSI)
+local function cwarn(msg)   warn(msg) end                             -- yellow via warn()
+local function cinfo(msg)   print(msg) end                            -- white
+
+-- Loading bar: prints ONE line per step, no spam.
+-- steps = total number of steps, current = which step just finished.
+local LOAD_STEPS = 18
+local loadStep   = 0
+
+local function loadBar(label)
+    loadStep = loadStep + 1
+    local filled = math.floor((loadStep / LOAD_STEPS) * 10)
+    local empty  = 10 - filled
+    local bar    = "[" .. string.rep("=", filled) .. string.rep(" ", empty) .. "]"
+    local pct    = math.floor((loadStep / LOAD_STEPS) * 100)
+    cinfo(string.format("[SPTS] %s %d%%  %s", bar, pct, label))
+end
+
+-- ── Executor detection ────────────────────────────────────────
+
+local executorName = "Unknown"
+if identifyexecutor then
+    local ok, name = pcall(identifyexecutor)
+    if ok and name then executorName = tostring(name) end
+elseif getexecutorname then
+    local ok, name = pcall(getexecutorname)
+    if ok and name then executorName = tostring(name) end
+end
+
+_G.ExecutorName = executorName
+
+local execLower = executorName:lower()
+if execLower:find("solara") or execLower:find("xeno") then
+    cprint("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
+end
+
+-- ── Module loader ─────────────────────────────────────────────
+
 local function load(path)
     local src = game:HttpGet(BASE .. path)
     local fn, err = loadstring(src, "@" .. path)
@@ -12,21 +52,19 @@ local function load(path)
     return fn()
 end
 
--- ── Module.lua ────────────────────────────────────────────────
+-- ── Boot sequence ─────────────────────────────────────────────
 
-_G.Z = load("Module.lua")
+cinfo("[SPTS] ── Starting SPTS ──────────────────────────")
 
--- ── Rayfield ──────────────────────────────────────────────────
+_G.Z = load("Module.lua");    loadBar("Module.lua")
 
 getgenv().RAYFIELD_ASSET_ID = 10804731440
 _G.Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+loadBar("Rayfield UI")
 
--- ── Core ──────────────────────────────────────────────────────
+load("core/state.lua");        loadBar("State")
+load("core/services.lua");     loadBar("Services")
 
-load("core/state.lua")    -- _G.Settings, _G.Stats, _G.RawStats, constants
-load("core/services.lua") -- _G.LP, _G.Remote, service refs, anti-AFK
-
--- Respawn helper: body.lua and util_tab.lua both call _G.doRespawn.
 local Remote          = _G.Remote
 local LP              = _G.LP
 local RESPAWN_PAYLOAD = { [1] = "Respawn" }
@@ -39,43 +77,29 @@ _G.doRespawn = function()
     Remote:FireServer(RESPAWN_PAYLOAD)
 end
 
-load("core/stats.lua")     -- stat sniffer loop
-load("core/exploit_check.lua") -- _G.ExploitCaps + colored F9 console output
-load("core/gui_utils.lua") -- fireGuiSignal, clickGuiCenter, etc. → _G.guiUtils
-
--- ── Shared toggle table ───────────────────────────────────────
+load("core/stats.lua");        loadBar("Stats sniffer")
+load("core/exploit_check.lua"); loadBar("Exploit check")
+load("core/gui_utils.lua");    loadBar("GUI utils")
 
 _G.Toggles     = {}
 _G.cascadeLock = false
 
--- ── Rayfield window ───────────────────────────────────────────
+load("ui/window.lua");         loadBar("Window")
+load("ui/toggle_sync.lua");    loadBar("Toggle sync")
 
-load("ui/window.lua")      -- creates _G.Tabs and _G.RayfieldWindow
+load("sath/quest_defs.lua");   loadBar("Quest defs")
+load("sath/scanner.lua");      loadBar("Scanner")
+load("sath/farm.lua");         loadBar("Farm")
+load("sath/dialog.lua");       loadBar("Dialog")
 
--- ── Toggle sync ───────────────────────────────────────────────
-
-load("ui/toggle_sync.lua") -- _G.syncFarmToggles, _G.setToggleVisual, _G.setTrainingUiLocked
-
--- ── Sath ──────────────────────────────────────────────────────
-
--- Load farm first so its _G globals exist before any training loop runs.
-load("sath/quest_defs.lua") -- _G.SATH_QUEST_DEFS (used by scanner + farm)
-load("sath/scanner.lua")    -- _G.sathScanner
-load("sath/farm.lua")       -- _G.pauseConflictingFarms, _G.applySathFarmPhase, etc.
-load("sath/dialog.lua")     -- _G.tryAdvanceSathQuest
-
--- ── Training ──────────────────────────────────────────────────
-
-load("training/tools.lua")   -- _G.unequipAllTools, _G.useStarterTraining, etc.
+load("training/tools.lua");    loadBar("Tools")
 load("training/fist.lua")
-load("training/body.lua")    -- also sets _G.bodyModule
+load("training/body.lua")
 load("training/mobility.lua")
-load("training/psychic.lua") -- _G.stopFlyMode, _G.isFlying, _G.hasMeditateEquipped
+load("training/psychic.lua");  loadBar("Training loops")
 
 -- ── Character events ──────────────────────────────────────────
 
--- After every respawn, click the IntroGui "SPAWN" button automatically
--- so the death screen doesn't block the Sath quest loop.
 local function dismissIntroGui()
     local playerGui = LP:FindFirstChild("PlayerGui")
     if not playerGui then return end
@@ -85,7 +109,6 @@ local function dismissIntroGui()
     local playBtn = introGui:FindFirstChild("PlayBtn")
     if not playBtn then return end
 
-    -- Wait for the button to be ready ("SPAWN" or "PLAY").
     local deadline = tick() + 12
     while tick() < deadline do
         local t = playBtn.Text
@@ -93,42 +116,35 @@ local function dismissIntroGui()
         task.wait(0.2)
     end
 
-    -- Try every available method to click the button.
     local caps = _G.ExploitCaps or {}
 
-    -- Method 1: firesignal on MouseButton1Click
     if caps.firesignal and firesignal then
-        local ok2, sig2 = pcall(function() return playBtn.MouseButton1Click end)
-        if ok2 and sig2 then pcall(firesignal, sig2) end
+        local ok, sig = pcall(function() return playBtn.MouseButton1Click end)
+        if ok and sig then pcall(firesignal, sig) end
     end
 
-    -- Method 2: getconnections + Fire on MouseButton1Click
     if caps.getconnections and getconnections then
         for _, evName in ipairs({ "MouseButton1Click", "MouseButton1Down" }) do
-            local ok3, sig3 = pcall(function() return playBtn[evName] end)
-            if ok3 and sig3 then
-                local ok4, conns = pcall(getconnections, sig3)
-                if ok4 and conns then
+            local ok, sig = pcall(function() return playBtn[evName] end)
+            if ok and sig then
+                local ok2, conns = pcall(getconnections, sig)
+                if ok2 and conns then
                     for _, c in ipairs(conns) do pcall(function() c:Fire() end) end
                 end
             end
         end
     end
 
-    -- Method 3: VirtualInputManager click at button center (always attempted)
     pcall(function()
         local pos   = playBtn.AbsolutePosition
         local size  = playBtn.AbsoluteSize
         local inset = game:GetService("GuiService"):GetGuiInset()
-        local x = pos.X + size.X * 0.5 + inset.X
-        local y = pos.Y + size.Y * 0.5 + inset.Y
-        local vim = game:GetService("VirtualInputManager")
-        vim:SendMouseButtonEvent(x, y, 0, true,  game, 0)
+        local vim   = game:GetService("VirtualInputManager")
+        vim:SendMouseButtonEvent(pos.X + size.X * 0.5 + inset.X, pos.Y + size.Y * 0.5 + inset.Y, 0, true,  game, 0)
         task.wait(0.1)
-        vim:SendMouseButtonEvent(x, y, 0, false, game, 0)
+        vim:SendMouseButtonEvent(pos.X + size.X * 0.5 + inset.X, pos.Y + size.Y * 0.5 + inset.Y, 0, false, game, 0)
     end)
 
-    -- Wait for the GUI to disappear.
     deadline = tick() + 8
     while tick() < deadline and introGui.Enabled do
         task.wait(0.2)
@@ -137,8 +153,6 @@ end
 
 LP.CharacterAdded:Connect(function(char)
     _G.ppTeleported = false
-
-    -- Dismiss the death/spawn screen first so loops aren't blocked.
     task.spawn(dismissIntroGui)
 
     if savedRespawnPos then
@@ -146,41 +160,29 @@ LP.CharacterAdded:Connect(function(char)
         savedRespawnPos = nil
         task.spawn(function()
             local root = char:WaitForChild("HumanoidRootPart", 6)
-            if root then
-                task.wait(0.4)
-                root.CFrame = CFrame.new(pos)
-            end
+            if root then task.wait(0.4); root.CFrame = CFrame.new(pos) end
         end)
     end
 
-    if _G.bodyModule then
-        _G.bodyModule.bindCharacterEvents(char)
-    end
+    if _G.bodyModule then _G.bodyModule.bindCharacterEvents(char) end
 end)
 
 if LP.Character and _G.bodyModule then
     _G.bodyModule.bindCharacterEvents(LP.Character)
 end
 
--- ── UI tabs ───────────────────────────────────────────────────
-
-load("players/esp.lua")  -- _G.espModule
-load("players/kill.lua") -- _G.killModule
+load("players/esp.lua");       loadBar("ESP")
+load("players/kill.lua")
 
 load("ui/dashboard_tab.lua")
 load("ui/autofarm_tab.lua")
 load("ui/nav_tab.lua")
-load("ui/equip_tab.lua")    -- defines _G.setSathEquipWeight
+load("ui/equip_tab.lua")
 load("ui/util_tab.lua")
 load("ui/theme_tab.lua")
-load("ui/players_tab.lua")
+load("ui/players_tab.lua");    loadBar("UI tabs")
 
--- ── Sath automation loop ──────────────────────────────────────
-
--- Loaded last so every function it calls is already defined.
-load("sath/loop.lua")
-
--- ── Saved config ──────────────────────────────────────────────
+load("sath/loop.lua");         loadBar("Sath loop")
 
 _G.Rayfield:LoadConfiguration()
 
@@ -191,3 +193,5 @@ end
 if _G.Settings.AutoSathQuest and _G.setTrainingUiLocked then
     _G.setTrainingUiLocked(true)
 end
+
+cprint("[SPTS] ══ Loaded successfully ══════════════════")

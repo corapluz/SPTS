@@ -1,6 +1,10 @@
--- Dashboard tab: live stat labels that refresh every 0.5 s.
+-- Dashboard tab: executor info + live stat labels.
 
 local Tabs = _G.Tabs
+
+Tabs.Dash:CreateSection("System")
+
+Tabs.Dash:CreateLabel("Executor: " .. (_G.ExecutorName or "Unknown"), 4483362458)  -- info icon
 
 Tabs.Dash:CreateSection("Live Stats")
 
