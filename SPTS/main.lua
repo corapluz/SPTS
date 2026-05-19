@@ -117,10 +117,11 @@ local function dismissIntroGui()
 
     -- Method 3: VirtualInputManager click at button center (always attempted)
     pcall(function()
-        local pos  = playBtn.AbsolutePosition
-        local size = playBtn.AbsoluteSize
-        local x = pos.X + size.X * 0.5
-        local y = pos.Y + size.Y * 0.5
+        local pos   = playBtn.AbsolutePosition
+        local size  = playBtn.AbsoluteSize
+        local inset = game:GetService("GuiService"):GetGuiInset()
+        local x = pos.X + size.X * 0.5 + inset.X
+        local y = pos.Y + size.Y * 0.5 + inset.Y
         local vim = game:GetService("VirtualInputManager")
         vim:SendMouseButtonEvent(x, y, 0, true,  game, 0)
         task.wait(0.1)

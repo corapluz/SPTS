@@ -36,12 +36,15 @@ local function collectGuiSignals(gui)
 end
 
 -- Sends a real mouse click at screen coordinates via VirtualInputManager.
+-- AbsolutePosition doesn't account for the GUI inset (top bar), so we
+-- add the inset offset to get the correct screen position.
 local function sendVirtualClick(x, y)
     pcall(function()
-        local vim = game:GetService("VirtualInputManager")
-        vim:SendMouseButtonEvent(x, y, 0, true,  game, 0)
+        local inset = game:GetService("GuiService"):GetGuiInset()
+        local vim   = game:GetService("VirtualInputManager")
+        vim:SendMouseButtonEvent(x + inset.X, y + inset.Y, 0, true,  game, 0)
         task.wait(0.08)
-        vim:SendMouseButtonEvent(x, y, 0, false, game, 0)
+        vim:SendMouseButtonEvent(x + inset.X, y + inset.Y, 0, false, game, 0)
     end)
 end
 
