@@ -77,13 +77,12 @@ local function tryEnterFlyMode()
     local hum, root = getHumAndRoot()
     if not hum or not root or hum.Health <= 0 then return false end
 
-    -- First Space press — jump
+    -- Double jump: Space → 0.8s → Space
+    -- First press jumps, second press in freefall activates fly.
     doJump()
     task.wait(0.8)
-    -- Second Space press — activates fly while in freefall
     doJump()
 
-    -- Wait for _G.Flying to become true
     local t0 = tick()
     while tick() - t0 < 1.5 do
         if _G.isFlying() then return true end
