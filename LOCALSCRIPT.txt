@@ -1,0 +1,4198 @@
+--game:GetService("Players").LocalPlayer.PlayerScripts.LocalScript
+local Players_2 = game:GetService("Players")
+local LocalPlayer = Players_2.LocalPlayer
+local PolicyService = game:GetService("PolicyService")
+local _, _2 = pcall(function() --[[ Line: 8 | Upvalues: PolicyService (copy), LocalPlayer (copy) ]]
+	return PolicyService:GetPolicyInfoForPlayerAsync(LocalPlayer)
+end)
+local ClientRemoteController_Module = require(script:WaitForChild("ClientRemoteController_Module"))
+ClientRemoteController_Module.CreateOnClientRemoteEvent(LocalPlayer)
+local SathDialog_Module = require(script.ClientRemoteController_Module:WaitForChild("SathDialog_Module"))
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEvent = ReplicatedStorage:WaitForChild("RemoteEvent")
+local AnimStorage = ReplicatedStorage:WaitForChild("AnimStorage")
+workspace:WaitForChild("Terrain")
+local Map = workspace:WaitForChild("Map")
+Map:WaitForChild("WhiteLists"):GetDescendants()
+local v1 = Random.new(tick())
+local function SpawnThread(p1) --[[ SpawnThread | Line: 37 ]]
+	coroutine.resume(coroutine.create(p1))
+end
+math.random(tick())
+local t = {
+	fly = time(),
+	bulletPunch = time(),
+	teleport = time(),
+	punch = time(),
+	invisible = time(),
+	spherePunch = time(),
+	soulAttack = time(),
+	killingIntent = time(),
+	concealAura = time(),
+	soulReap = time(),
+	hellfire = time()
+}
+_G.Flying = false
+local MarketplaceService = game:GetService("MarketplaceService")
+CurrentCamera = workspace.CurrentCamera
+Lighting = game:GetService("Lighting")
+HttpService = game:GetService("HttpService")
+UserInputService = game:GetService("UserInputService")
+RunService = game:GetService("RunService")
+TweenService = game:GetService("TweenService")
+TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+	FieldOfView = 80
+})
+TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.1, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), {
+	FieldOfView = 70
+})
+Debris = game:GetService("Debris")
+TrainingArea = Map:WaitForChild("TrainingArea")
+Players = game:GetService("Players")
+PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+IntroGui = PlayerGui:WaitForChild("IntroGui")
+ScreenGui = PlayerGui:WaitForChild("ScreenGui")
+MenuFrame = ScreenGui:WaitForChild("MenuFrame")
+MainQuestFrame = ScreenGui:WaitForChild("MainQuestFrame")
+SpecialQuestFrame = ScreenGui:WaitForChild("SpecialQuestFrame")
+DailyQuestFrame = ScreenGui:WaitForChild("DailyQuestFrame")
+WeeklyQuestFrame = ScreenGui:WaitForChild("WeeklyQuestFrame")
+RankEmblemFrame = ScreenGui:WaitForChild("RankEmblemFrame")
+TokenImgBtn = ScreenGui:WaitForChild("CurrentGemImgBtn")
+QuestMsgFrame = ScreenGui:WaitForChild("QuestMsgFrame")
+QuestTalkBtn = ScreenGui:WaitForChild("QuestTalkBtn")
+QuestTalkBtn.Visible = false
+RankImgBtn = ScreenGui:WaitForChild("RankImgBtn")
+MenuBtn = ScreenGui:WaitForChild("MenuBtn")
+SafeZoneTxt = ScreenGui:WaitForChild("SafeZoneTxt")
+WeightFrame = ScreenGui:WaitForChild("WeightFrame")
+WarnTxt = ScreenGui:WaitForChild("WarnTxt")
+skillHotkey_Frame = ScreenGui:WaitForChild("SkillHotkey_Frame")
+gift_Frame = ScreenGui:WaitForChild("Gift_Frame")
+IntroPlayBtnGuiCount = 0
+local v2 = false
+local v3 = nil
+repeat
+	wait(1)
+	if IntroPlayBtnGuiCount == 0 then
+		IntroGui:WaitForChild("PlayBtn").Text = " Loading "
+		IntroPlayBtnGuiCount = IntroPlayBtnGuiCount + 1
+		continue
+	end
+	if IntroPlayBtnGuiCount == 1 then
+		IntroGui:WaitForChild("PlayBtn").Text = " Loading. "
+		IntroPlayBtnGuiCount = IntroPlayBtnGuiCount + 1
+		continue
+	end
+	if IntroPlayBtnGuiCount == 2 then
+		IntroGui:WaitForChild("PlayBtn").Text = " Loading.. "
+		IntroPlayBtnGuiCount = IntroPlayBtnGuiCount + 1
+		continue
+	end
+	IntroGui:WaitForChild("PlayBtn").Text = " Loading... "
+	IntroPlayBtnGuiCount = 0
+until _G.ClientPlrData.Finished_SetUpGuiInfo
+IntroGui:WaitForChild("PlayBtn").Text = "PLAY"
+local LocalSoundStorage = game:GetService("SoundService"):WaitForChild("LocalSoundStorage")
+local SfxSoundGroup = LocalSoundStorage:WaitForChild("SfxSoundGroup")
+BackgroundSound = LocalSoundStorage:WaitForChild("BackgroundSound")
+BadgeGivenSound = LocalSoundStorage:WaitForChild("BadgeGivenSound")
+LevelUpSound = LocalSoundStorage:WaitForChild("LevelUpSound")
+QuestDoneSound = LocalSoundStorage:WaitForChild("QuestDoneSound")
+ClickSound = LocalSoundStorage:WaitForChild("ClickSound")
+Click2Sound = LocalSoundStorage:WaitForChild("Click2Sound")
+ConfirmSound = LocalSoundStorage:WaitForChild("ConfirmSound")
+Confirm2Sound = LocalSoundStorage:WaitForChild("Confirm2Sound")
+ErrorSound = LocalSoundStorage:WaitForChild("ErrorSound")
+CollectSound = LocalSoundStorage:WaitForChild("CollectSound")
+DeathSound = LocalSoundStorage:WaitForChild("DeathSound")
+KillSound = LocalSoundStorage:WaitForChild("KillSound")
+EquipSound = LocalSoundStorage:WaitForChild("EquipSound")
+BackgroundSound:Play()
+local Map_2 = workspace:WaitForChild("Map")
+workspace.DescendantAdded:Connect(function(p1) --[[ Line: 151 | Upvalues: SfxSoundGroup (copy) ]]
+	if not p1:IsA("Sound") then
+		return
+	end
+	p1.SoundGroup = SfxSoundGroup
+end)
+workspace:WaitForChild("Effects").ChildAdded:Connect(function(p1) --[[ Line: 156 ]]
+	if not p1:IsA("BasePart") or (p1.Name ~= "SPTS_AHP" or not _G.ClientPlrData.Settings.Hide_AdvSkill_EFX) then
+		return
+	end
+	p1.Transparency = 0.555
+end)
+CanFly = false
+Flying = false
+Swimming = false
+TalkingOnQuest = false
+mouse = LocalPlayer:GetMouse()
+mouse.TargetFilter = workspace:WaitForChild("Effects")
+MenuCamCFrame = CFrame.new(705.671021, 941.897827, 864.893188, 0.459262937, -0.712803423, 0.530083895, -0, 0.596739471, 0.8024351, -0.888300419, -0.368528694, 0.274060309)
+MenuCamFocus = CFrame.new(695.069336, 925.849121, 859.411987, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+_G.IsMobile = false
+if not UserInputService.MouseEnabled and UserInputService.TouchEnabled then
+	_G.IsMobile = true
+end
+local v4 = ""
+local t2 = {
+	"K",
+	"M",
+	"B",
+	"T",
+	"Qa",
+	"Qi",
+	"Sx",
+	"Sp",
+	"Oc",
+	"No",
+	"Dc",
+	"Ud",
+	"Dd",
+	"Td",
+	"Qad",
+	"Qid",
+	"Sxd",
+	"Spd",
+	"Ocd",
+	"Nod",
+	"Vg",
+	"Uvg",
+	"Dvg",
+	"Tvg",
+	"Qavg",
+	"Qivg",
+	"Sxvg",
+	"Spvg",
+	"Ocvg",
+	"Novg",
+	"Tg",
+	"Utg",
+	"Dtg",
+	"Ttg",
+	"Qatg",
+	"Qitg",
+	"Sxtg",
+	"Sptg",
+	"Octg",
+	"Notg"
+}
+local function AddSuffix(p1) --[[ AddSuffix | Line: 187 | Upvalues: t2 (copy) ]]
+	if not tonumber(p1) then
+		return "Nan"
+	end
+	if p1 == (1 / 0) then
+		return "Inf"
+	end
+	for i = #t2, 1, -1 do
+		local v1 = math.pow(10, i * 3)
+		if v1 <= p1 then
+			local v2 = p1 / v1
+			return tostring(v2 - v2 % 0.001):sub(1, 5) .. t2[i]
+		end
+	end
+	return tostring(p1)
+end
+local function AddCommas(p1) --[[ AddCommas | Line: 205 ]]
+	local v1 = p1
+	local v2
+	while true do
+		local v3
+		v2, v3 = string.gsub(v1, "^(-?%d+)(%d%d%d)", "%1,%2")
+		if v3 == 0 then
+			break
+		end
+		v1 = v2
+	end
+	return v2
+end
+local function TargetLock() --[[ TargetLock | Line: 217 ]]
+	if Flying or not (Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and SoulAttack_Target))) then
+		return
+	end
+	local v1 = HumanoidRootPart
+	local v2 = CFrame.new
+	local Position = HumanoidRootPart.Position
+	local X = SoulAttack_Target.Position.X
+	local Y = HumanoidRootPart.Position.Y
+	v1.CFrame = v2(Position, (Vector3.new(X, Y, SoulAttack_Target.Position.Z)))
+end
+local function LookAtMouse(p1) --[[ LookAtMouse | Line: 223 ]]
+	if not (Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and p1))) then
+		return
+	end
+	local v1 = HumanoidRootPart
+	v1.CFrame = CFrame.new(HumanoidRootPart.Position, (Vector3.new(p1.Position.X, HumanoidRootPart.Position.Y, p1.Position.Z)))
+end
+local t3 = {}
+function PlayAnim(p1) --[[ PlayAnim | Line: 231 | Upvalues: t3 (ref), AnimStorage (copy) ]]
+	if typeof(p1) == "string" then
+		if not t3[tostring(p1)] then
+			local Animation = Instance.new("Animation")
+			Animation.AnimationId = p1
+			Animation.Name = p1
+			Animation.Parent = AnimStorage
+			t3[tostring(p1)] = Humanoid:LoadAnimation(Animation)
+		end
+		t3[tostring(p1)]:Play(0.1, 1, 1)
+	else
+		if not t3[p1.Name] then
+			t3[p1.Name] = Humanoid:LoadAnimation(p1)
+		end
+		if p1.Name == "KillingIntentAttackerAnim" then
+			t3.KillingIntentAttackerAnim:Play(0.1, 1, 1.5)
+			return
+		end
+		if p1.Name == "FlyIdleAnim" then
+			t3.FlyIdleAnim:Play(0.2, 1, 1)
+			return
+		end
+		if p1.Name == "FlyForwardAnim" then
+			local v1 = nil
+			v1 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 255 | Upvalues: t3 (ref), p1 (copy), v1 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v1:Disconnect()
+			end)
+			t3.FlyForwardAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "FlyBackAnim" then
+			local v2 = nil
+			v2 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 265 | Upvalues: t3 (ref), p1 (copy), v2 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v2:Disconnect()
+			end)
+			t3.FlyBackAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "FlyLeftAnim" then
+			local v3 = nil
+			v3 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 273 | Upvalues: t3 (ref), p1 (copy), v3 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v3:Disconnect()
+			end)
+			t3.FlyLeftAnim:Play(0.1, 1, 2.5)
+			return
+		end
+		if p1.Name == "FlyRightAnim" then
+			local v4 = nil
+			v4 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 281 | Upvalues: t3 (ref), p1 (copy), v4 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v4:Disconnect()
+			end)
+			t3.FlyRightAnim:Play(0.1, 1, 2.5)
+			return
+		end
+		if p1.Name == "FlyUpAnim" then
+			local v5 = nil
+			v5 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 289 | Upvalues: t3 (ref), p1 (copy), v5 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v5:Disconnect()
+			end)
+			t3.FlyUpAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "FlyDownAnim" then
+			local v6 = nil
+			v6 = t3[p1.Name].KeyframeReached:Connect(function(p12) --[[ Line: 297 | Upvalues: t3 (ref), p1 (copy), v6 (ref) ]]
+				if p12 ~= "Pause" or not t3[p1.Name] then
+					return
+				end
+				t3[p1.Name]:AdjustSpeed(0)
+				v6:Disconnect()
+			end)
+			t3.FlyDownAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "BulletPunch1Anim" then
+			t3.BulletPunch1Anim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "BulletPunch2Anim" then
+			t3.BulletPunch2Anim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "BulletPunch1_AirAnim" then
+			t3.BulletPunch1_AirAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "BulletPunch2_AirAnim" then
+			t3.BulletPunch2_AirAnim:Play(0.1, 1, 2)
+			return
+		end
+		if p1.Name == "Punch1Anim" then
+			t3.Punch1Anim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "Punch2Anim" then
+			t3.Punch2Anim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "Punch1_AirAnim" then
+			t3.Punch1_AirAnim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "Punch2_AirAnim" then
+			t3.Punch2_AirAnim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "SpherePunchAnim" then
+			t3.SpherePunchAnim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "SpherePunch_AirAnim" then
+			t3.SpherePunch_AirAnim:Play(0.1, 1, 1)
+			return
+		end
+		if p1.Name == "FallAnim" then
+			t3.FallAnim:Play()
+		else
+			t3[p1.Name]:Play(0.1, 1, 1)
+		end
+	end
+end
+function StopAnim(p1) --[[ StopAnim | Line: 333 | Upvalues: t3 (ref) ]]
+	if not t3[p1.Name] then
+		return
+	end
+	t3[p1.Name]:Stop()
+end
+function StopAllAnim(p1) --[[ StopAllAnim | Line: 339 | Upvalues: t3 (ref) ]]
+	for k, v in pairs(t3) do
+		v:Stop()
+	end
+end
+function OpenOrCloseGuiFunc(p1) --[[ OpenOrCloseGuiFunc | Line: 345 ]]
+	if p1.Visible == false then
+		p1.Visible = true
+	else
+		p1.Visible = false
+	end
+end
+function MenuOpenFrameFunc(p1) --[[ MenuOpenFrameFunc | Line: 353 ]]
+	for k, v in pairs(MenuFrame:GetChildren()) do
+		if (v:IsA("Frame") or v:IsA("ScrollingFrame")) and (v.Name ~= "BorderFrame" and v ~= p1) then
+			v.Visible = false
+		end
+	end
+	p1.Visible = true
+end
+function QuestTalkFunc() --[[ QuestTalkFunc | Line: 362 | Upvalues: SathDialog_Module (copy), LocalPlayer (copy), RemoteEvent (copy), ReplicatedStorage (copy) ]]
+	QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, -0.2, 0), "Out", "Back", 0.5, true)
+	QuestTalkBtn.Visible = false
+	local Page = QuestMsgFrame:WaitForChild("Page")
+	local MsgTxt = QuestMsgFrame:WaitForChild("MsgTxt")
+	SathDialog_Module.CreateDialog(LocalPlayer, _G.ClientPlrData.QuestData.MainQuest.No, Page, MsgTxt)
+	if Page.Value > 0 then
+		Page.Value = Page.Value + 1
+		return
+	end
+	Page.Value = 1
+	QuestMsgFrame.Visible = false
+	if _G.IsMobile then
+		skillHotkey_Frame.Visible = true
+	end
+	if Character and (Character:FindFirstChild("Head") and workspace.CurrentCamera.CameraType == Enum.CameraType.Scriptable) then
+		workspace.CurrentCamera:Interpolate(CFrame.new(BeforeTalkToQuestNPCCameraCFrame.p), CFrame.new(Character.Head.Position), 1)
+		wait(1)
+	end
+	QuestDoneSound:Play()
+	workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+	workspace.CurrentCamera.CameraSubject = LocalPlayer.Character.Humanoid
+	Humanoid.WalkSpeed = 11
+	Humanoid.JumpPower = 51
+	RemoteEvent:FireServer({ "QuestTalkEnd", QuestTalkBtn:WaitForChild("Npc").Value })
+	TalkingOnQuest = false
+	if QuestTalkBtn:WaitForChild("Npc").Value == "GhostRider" then
+		return
+	end
+	spawn(function() --[[ Line: 399 | Upvalues: ReplicatedStorage (ref) ]]
+		local v1 = ReplicatedStorage:WaitForChild("MissionCompleteTxt"):Clone()
+		v1.Parent = ScreenGui
+		v1:TweenSizeAndPosition(UDim2.new(0.5, 0, 0.2, 0), UDim2.new(0.25, 0, 0.4, 0), "In", "Bounce", 2, true)
+		wait(4)
+		for i = 0, 20 do
+			v1.TextTransparency = v1.TextTransparency + 0.05
+			v1.TextStrokeTransparency = v1.TextStrokeTransparency + 0.05
+			wait(0.05)
+		end
+		v1:Destroy()
+	end)
+end
+local function IsPointInPart(p1, p2) --[[ IsPointInPart | Line: 422 ]]
+	local v1 = p2.CFrame:PointToObjectSpace(p1)
+	return if math.abs(v1.X) < p2.Size.X * 0.5 then if math.abs(v1.Y) < p2.Size.Y * 0.5 then math.abs(v1.Z) < p2.Size.Z * 0.5 else false else false
+end
+local function IsInServer(p1) --[[ IsInServer | Line: 427 ]]
+	return p1 and p1.Parent and true or false
+end
+local function IsAlive(p1) --[[ IsAlive | Line: 435 ]]
+	return p1 and (p1.Character and (p1.Character.PrimaryPart and (p1.Character:FindFirstChildOfClass("Humanoid") and (p1.Character:FindFirstChildOfClass("Humanoid").Health > 0 and p1.Character:FindFirstChildOfClass("Humanoid"):GetState() ~= Enum.HumanoidStateType.Dead)))) and true or false
+end
+local function WarpPlrToPart(p1, p2) --[[ WarpPlrToPart | Line: 448 ]]
+	p1:SetPrimaryPartCFrame(CFrame.new(p2.Position + Vector3.new(0, 3.5, 0)) * (p1.PrimaryPart.CFrame - p1.PrimaryPart.Position))
+end
+local function WarpPlrToCFrame(p1, p2) --[[ WarpPlrToCFrame | Line: 452 ]]
+	p1:SetPrimaryPartCFrame(p2 + Vector3.new(0, 3.5, 0))
+end
+local function GetRandomCFrameInPart(p1) --[[ GetRandomCFrameInPart | Line: 456 | Upvalues: v1 (copy) ]]
+	if not p1:IsA("BasePart") then
+		if not (#p1:GetChildren() > 0) then
+			return nil
+		end
+		local v12 = p1:GetChildren()[v1:NextInteger(1, #p1:GetChildren())]
+		if v12 and v12:IsA("BasePart") then
+			p1 = v12
+		end
+	end
+	local v2 = p1.Size.X / 2
+	local v3 = p1.Size.Y / 2
+	local v4 = p1.Size.Z / 2
+	return p1.CFrame + Vector3.new(v1:NextInteger(-v2, v2), v1:NextInteger(-v3, v3), v1:NextInteger(-v4, v4))
+end
+local function GetPlrFromTouchedPart(p1, p2, p3) --[[ GetPlrFromTouchedPart | Line: 475 | Upvalues: Players_2 (copy), IsAlive (copy) ]]
+	if not (p1 and (p1:FindFirstAncestorOfClass("Model") and Players_2:GetPlayerFromCharacter(p1:FindFirstAncestorOfClass("Model")))) then
+		return nil
+	end
+	if (not p3 or Players_2:GetPlayerFromCharacter(p1:FindFirstAncestorOfClass("Model")) == p3) and p3 then
+		return nil
+	end
+	if not p2 then
+		return Players_2:GetPlayerFromCharacter(p1:FindFirstAncestorOfClass("Model"))
+	end
+	if IsAlive(Players_2:GetPlayerFromCharacter(p1:FindFirstAncestorOfClass("Model"))) then
+		return Players_2:GetPlayerFromCharacter(p1:FindFirstAncestorOfClass("Model"))
+	else
+		return false
+	end
+end
+local v5 = 0
+function onJumpRequest() --[[ onJumpRequest | Line: 495 | Upvalues: v5 (ref), AnimStorage (copy) ]]
+	if not Character or (not Humanoid or (not Character:IsDescendantOf(workspace) or (Humanoid:GetState() == Enum.HumanoidStateType.Dead or Humanoid.JumpPower <= 0))) then
+		return
+	end
+	if CanFly and (not Flying and (not TalkingOnQuest and (_G.ClientPlrData.QuestData.MainQuest.No >= 10 and (_G.ClientPlrData.JumpForce >= 10000 and (_G.ClientPlrData.PsychicPower >= 50 and _G.ClientPlrData.Settings.ToggleFlight))))) then
+		CanFly = false
+		Flying = true
+		_G.Flying = true
+		v5 = 0
+		Humanoid:SetStateEnabled(5, false)
+		Humanoid:SetStateEnabled(7, false)
+		Humanoid:SetStateEnabled(8, false)
+		PlayAnim(AnimStorage:WaitForChild("FlyIdleAnim"))
+		if wUp then
+			if sUp then
+				if aUp then
+					if dUp then
+						if eUp then
+							if qUp then
+								FlyFunc()
+								return
+							end
+							PlayAnim(AnimStorage:WaitForChild("FlyDownAnim"))
+						else
+							PlayAnim(AnimStorage:WaitForChild("FlyUpAnim"))
+						end
+					else
+						PlayAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+					end
+				else
+					PlayAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+				end
+			else
+				PlayAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+			end
+		else
+			PlayAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+		end
+		FlyFunc()
+	else
+		if Flying ~= true or (not (_G.ClientPlrData.JumpForce >= 10000) or (not (_G.ClientPlrData.PsychicPower >= 50) or Character:FindFirstChild("Meditate"))) then
+			return
+		end
+		local v1, errorinfo = pcall(function() --[[ Line: 534 | Upvalues: AnimStorage (ref) ]]
+			Flying = false
+			_G.Flying = false
+			Humanoid:SetStateEnabled(7, true)
+			if FlyRunService then
+				FlyRunService:Disconnect()
+			end
+			for i, v in ipairs(HumanoidRootPart:GetChildren()) do
+				if v:IsA("BodyVelocity") or v:IsA("BodyGyro") then
+					v:Destroy()
+				end
+			end
+			StopAnim(AnimStorage:WaitForChild("FlyIdleAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyUpAnim"))
+			StopAnim(AnimStorage:WaitForChild("FlyDownAnim"))
+			Humanoid:SetStateEnabled(5, true)
+			Humanoid:SetStateEnabled(8, true)
+			wait(0.25)
+			if Landed then
+				return
+			end
+			CanFly = true
+		end)
+		if v1 then
+			return
+		end
+		print("Error info :", errorinfo)
+	end
+end
+_G.AnimTracks = {}
+local function OnCharacterAdded(p1) --[[ OnCharacterAdded | Line: 574 | Upvalues: t (copy), ClientRemoteController_Module (copy), LocalPlayer (copy), t3 (ref), v5 (ref), RemoteEvent (copy), v4 (ref), ReplicatedStorage (copy) ]]
+	t.teleport = time() + 1
+	if _G.IsMobile then
+		skillHotkey_Frame.Visible = true
+	else
+		skillHotkey_Frame.Visible = false
+	end
+	ClientRemoteController_Module.Storage.TouchingQuestPart = false
+	Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:wait()
+	Humanoid = Character:WaitForChild("Humanoid")
+	if _G.ClientPlrData.QuestData.MainQuest.No >= 7 then
+		if _G.ClientPlrData.Settings.ToggleWaterRun then
+			Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
+		else
+			Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming, true)
+		end
+	end
+	workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+	workspace.CurrentCamera.CameraSubject = Humanoid
+	HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+	CanFly = false
+	Flying = false
+	Swimming = false
+	_G.Flying = false
+	_G.Meditating = false
+	_G.Relaxed = false
+	Landed = true
+	TalkingOnQuest = false
+	Combat_FirstPunch = false
+	CanPunch = true
+	CanBeInvisible = true
+	Invisible = false
+	CanSpherePunch = true
+	CanSoulReap = true
+	CanUseDevilFlame = true
+	CanTeleport = true
+	CanBulletPunch = true
+	CanConcealAura = true
+	CanSoulAttack = true
+	CanKillingIntent = true
+	SoulAttacking = false
+	t3 = {}
+	Humanoid:SetStateEnabled(0, false)
+	Humanoid:SetStateEnabled(1, false)
+	if Character:FindFirstChild("Animate") and (Character.Animate:FindFirstChild("fall") and (Character.Animate.fall:FindFirstChild("FallAnim") and Character.Animate.fall.FallAnim.AnimationId == "http://www.roblox.com/asset/?id=507767968")) then
+		Character.Animate.fall.FallAnim.AnimationId = "http://www.roblox.com/asset/?id=656115606"
+	end
+	if Character:FindFirstChild("Animate") and (Character.Animate:FindFirstChild("jump") and (Character.Animate.jump:FindFirstChild("JumpAnim") and Character.Animate.jump.JumpAnim.AnimationId == "http://www.roblox.com/asset/?id=507765000")) then
+		Character.Animate.jump.JumpAnim.AnimationId = "http://www.roblox.com/asset/?id=656117878"
+	end
+	Humanoid.StateChanged:connect(function(p1, p2) --[[ Line: 649 ]]
+		if p2 == Enum.HumanoidStateType.Landed then
+			CanFly = false
+			Flying = false
+			Swimming = false
+		else
+			if p2 == Enum.HumanoidStateType.Freefall then
+				CanFly = true
+				Flying = false
+				Swimming = false
+				Landed = false
+				return
+			end
+			if p2 ~= Enum.HumanoidStateType.Swimming then
+				return
+			end
+			Swimming = true
+		end
+		Landed = true
+	end)
+	v5 = 0
+	Humanoid.Running:Connect(function(p1) --[[ Line: 669 | Upvalues: v5 (ref) ]]
+		v5 = p1
+	end)
+	local v2 = 0
+	Humanoid.Jumping:Connect(function(p1) --[[ Line: 674 | Upvalues: ClientRemoteController_Module (ref), v2 (ref), RemoteEvent (ref) ]]
+		if not p1 then
+			return
+		end
+		if _G.Flying or Humanoid.JumpPower <= 9 then
+			if _G.Flying or (not (Humanoid.JumpPower <= 9) or (not HumanoidRootPart or HumanoidRootPart.Anchored ~= false)) then
+				return
+			end
+			WarnTxt.Text = "too heavy to train Jump Force!"
+			ClientRemoteController_Module.PopUpAndAutoHideGui(WarnTxt, 1)
+		else
+			v2 = v2 + 1
+			if not (v2 >= math.random(2, 3)) then
+				return
+			end
+			v2 = 0
+			if QuestMsgFrame.Visible ~= false or not (_G.ClientPlrData.QuestData.MainQuest.No >= 2 and Character) then
+				return
+			end
+			RemoteEvent:FireServer({ "Add_JF_Request" })
+		end
+	end)
+	Humanoid.Died:Connect(function() --[[ Line: 698 | Upvalues: ClientRemoteController_Module (ref), t3 (ref), v4 (ref), LocalPlayer (ref) ]]
+		CanFly = false
+		Flying = false
+		Swimming = false
+		_G.Flying = false
+		_G.Meditating = false
+		_G.Relaxed = false
+		Landed = true
+		TalkingOnQuest = false
+		ClientRemoteController_Module.Storage.TouchingQuestPart = false
+		Combat_FirstPunch = false
+		CanPunch = true
+		CanBeInvisible = true
+		CanSpherePunch = true
+		CanSoulReap = true
+		CanUseDevilFlame = true
+		CanTeleport = true
+		CanBulletPunch = true
+		Invisible = false
+		t3 = {}
+		ScreenGui.Enabled = false
+		WeightFrame.Visible = false
+		skillHotkey_Frame.Visible = false
+		QuestTalkBtn.Visible = false
+		QuestTalkBtn.Position = UDim2.new(0.387, 0, -0.2, 0)
+		QuestMsgFrame.Visible = false
+		QuestMsgFrame:WaitForChild("Page").Value = 1
+		v4 = ""
+		if _G.ClientPlrData.Current_AFK_Training_Anim then
+			_G.ClientPlrData.Current_AFK_Training_Anim:Stop()
+			_G.ClientPlrData.Current_AFK_Training_Anim = nil
+		end
+		DeathSound:Play()
+		workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+		TweenService:Create(workspace.CurrentCamera, TweenInfo.new(3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+			CFrame = MenuCamCFrame,
+			Focus = MenuCamFocus
+		}):Play()
+		if ScreenGui:FindFirstChild("XpFrame") then
+			ScreenGui:FindFirstChild("XpFrame"):Destroy()
+		end
+		if ScreenGui:FindFirstChild("XpFrame") then
+			ScreenGui:FindFirstChild("XpFrame"):Destroy()
+		end
+		if ScreenGui:FindFirstChild("XpFrame") then
+			ScreenGui:FindFirstChild("XpFrame"):Destroy()
+		end
+		if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("UpperTorso") then
+			for i, v in ipairs(LocalPlayer.Character:GetDescendants()) do
+				if v:IsA("Beam") and v.Name == "SPTS_TLGB" then
+					v:Destroy()
+				end
+			end
+		end
+		_G.Guiding = false
+		wait(3)
+		IntroGui:WaitForChild("PlayBtn").Text = " SPAWN "
+		local Blur = Lighting:WaitForChild("Blur")
+		Blur.Enabled = true
+		IntroGui.Enabled = true
+		for i = 0, 20 do
+			wait(0.05)
+			local v1 = i + 1
+			for k, v in pairs(IntroGui:GetChildren()) do
+				if v.Name == "PlayBtn" then
+					v.TextTransparency = (20 - v1) / 20 + v1 * 0.01
+					v.BackgroundTransparency = (20 - v1) / 20 + v1 * 0.01
+					continue
+				end
+				if v.Name == "VersionTxt" then
+					v.TextTransparency = (20 - v1) / 20
+					continue
+				end
+				if v.Name == "ServerAgeTxt" then
+					v.TextTransparency = (20 - v1) / 20
+					continue
+				end
+				if v.Name == "HeaderTxt" then
+					v.TextTransparency = (20 - v1) / 20
+					v.TextStrokeTransparency = (20 - v1) / 20
+				end
+			end
+			Blur.Size = Blur.Size + 0.5
+		end
+		for k, v in pairs(IntroGui:GetChildren()) do
+			if v.Name == "PlayBtn" then
+				v.TextTransparency = 0
+				v.BackgroundTransparency = 0.2
+				continue
+			end
+			if v.Name == "VersionTxt" then
+				v.TextTransparency = 0
+				continue
+			end
+			if v.Name == "ServerAgeTxt" then
+				v.TextTransparency = 0
+				continue
+			end
+			if v.Name == "HeaderTxt" then
+				v.TextTransparency = 0
+				v.TextStrokeTransparency = 0
+			end
+		end
+	end)
+	if _G.ClientPlrData.QuestData.MainQuest.No == 0 or _G.ClientPlrData.QuestData.MainQuest.Done then
+		workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("QuestBbGui").Enabled = true
+		if Character and (Character:FindFirstChild("UpperTorso") and not Character:FindFirstChild("QuestBeam")) then
+			local Attachment0 = Instance.new("Attachment", Character.UpperTorso)
+			Attachment0.Name = "Attachment0"
+			local Attachment1 = Instance.new("Attachment", workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("UpperTorso"))
+			Attachment1.Name = "Attachment1"
+			local v3 = ReplicatedStorage:WaitForChild("QuestBeam"):Clone()
+			v3.Attachment0 = Attachment0
+			v3.Attachment1 = Attachment1
+			v3.Parent = Character
+		end
+	else
+		workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("QuestBbGui").Enabled = false
+		if Character and Character:FindFirstChild("QuestBeam") then
+			Character.QuestBeam:Destroy()
+			if Character:FindFirstChild("UpperTorso") and Character.UpperTorso:FindFirstChild("Attachment0") then
+				Character.UpperTorso.Attachment0:Destroy()
+			end
+			if workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("UpperTorso"):FindFirstChild("Attachment1") then
+				workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("UpperTorso"):FindFirstChild("Attachment1"):Destroy()
+			end
+		end
+	end
+	wait(1)
+	if _G.ClientPlrData.Settings.ShowNameTag or not (Character and (Character:FindFirstChild("Head") and (Character.PrimaryPart:FindFirstChild("SPTS_RK_BG") and Character.PrimaryPart:FindFirstChild("SPTS_PN_BG")))) then
+		return
+	end
+	Character.PrimaryPart:FindFirstChild("SPTS_RK_BG").Enabled = false
+	Character.PrimaryPart:FindFirstChild("SPTS_PN_BG").Enabled = false
+end
+if LocalPlayer.Character then
+	OnCharacterAdded(LocalPlayer.Character)
+end
+LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
+local function onPlayerAdded(p1) --[[ onPlayerAdded | Line: 851 | Upvalues: LocalPlayer (copy), RemoteEvent (copy) ]]
+	wait(3)
+	if LocalPlayer and (LocalPlayer.Character and (LocalPlayer.Character:FindFirstChild("Head") and LocalPlayer.Character.Head.Transparency > 0)) then
+		RemoteEvent:FireServer({ "CheckInvisible", p1 })
+	end
+	wait(7)
+	if LocalPlayer and (LocalPlayer.Character and (LocalPlayer.Character:FindFirstChild("Head") and LocalPlayer.Character.Head.Transparency > 0)) then
+		RemoteEvent:FireServer({ "CheckInvisible", p1 })
+	end
+	wait(10)
+	if not (LocalPlayer and (LocalPlayer.Character and (LocalPlayer.Character:FindFirstChild("Head") and LocalPlayer.Character.Head.Transparency > 0))) then
+		return
+	end
+	RemoteEvent:FireServer({ "CheckInvisible", p1 })
+end
+Players.PlayerAdded:Connect(onPlayerAdded)
+local function Use_LeftCtrl() --[[ Use_LeftCtrl | Line: 867 | Upvalues: ClientRemoteController_Module (copy) ]]
+	if Humanoid and (Humanoid.WalkSpeed ~= 0 or Humanoid.WalkSpeed == 0 and _G.Flying) and not _G.Relaxed then
+		_G.Relaxed = true
+		if _G.ClientPlrData.EquippedWeight > 0 then
+			if Humanoid.WalkSpeed > _G.ClientPlrData.Settings.RelaxedWS then
+				Humanoid.WalkSpeed = _G.ClientPlrData.Settings.RelaxedWS
+			end
+			if Humanoid.JumpPower > _G.ClientPlrData.Settings.RelaxedJP then
+				Humanoid.JumpPower = _G.ClientPlrData.Settings.RelaxedJP
+			end
+		else
+			Humanoid.WalkSpeed = _G.ClientPlrData.Settings.RelaxedWS
+			Humanoid.JumpPower = _G.ClientPlrData.Settings.RelaxedJP
+		end
+		if ClientRemoteController_Module.Storage.FlySpeed > _G.ClientPlrData.Settings.RelaxedFS then
+			ClientRemoteController_Module.Storage.FlySpeed = _G.ClientPlrData.Settings.RelaxedFS
+		end
+	else
+		if not Humanoid or Humanoid.WalkSpeed == 0 and (Humanoid.WalkSpeed ~= 0 or not _G.Flying) or not _G.Relaxed then
+			return
+		end
+		_G.Relaxed = false
+		if _G.ClientPlrData.EquippedWeight > 0 then
+			if _G.ClientPlrData.WalkSpeed then
+				Humanoid.WalkSpeed = _G.ClientPlrData.WalkSpeed
+			elseif Humanoid.WalkSpeed > _G.ClientPlrData.Settings.SelectedMS then
+				Humanoid.WalkSpeed = _G.ClientPlrData.Settings.SelectedMS
+			end
+			if _G.ClientPlrData.JumpPower then
+				Humanoid.JumpPower = _G.ClientPlrData.JumpPower
+			elseif Humanoid.JumpPower > _G.ClientPlrData.Settings.SelectedJP then
+				Humanoid.JumpPower = _G.ClientPlrData.Settings.SelectedJP
+			end
+			if _G.ClientPlrData.FlySpeed then
+				ClientRemoteController_Module.Storage.FlySpeed = _G.ClientPlrData.FlySpeed
+				return
+			end
+			if ClientRemoteController_Module.Storage.FlySpeed > _G.ClientPlrData.Settings.SelectedFS then
+				ClientRemoteController_Module.Storage.FlySpeed = _G.ClientPlrData.Settings.SelectedFS
+			end
+		else
+			if _G.ClientPlrData.WalkSpeed then
+				Humanoid.WalkSpeed = _G.ClientPlrData.WalkSpeed
+			else
+				Humanoid.WalkSpeed = _G.ClientPlrData.Settings.SelectedMS
+			end
+			if _G.ClientPlrData.JumpPower then
+				Humanoid.JumpPower = _G.ClientPlrData.JumpPower
+			else
+				Humanoid.JumpPower = _G.ClientPlrData.Settings.SelectedJP
+			end
+			if _G.ClientPlrData.FlySpeed then
+				ClientRemoteController_Module.Storage.FlySpeed = _G.ClientPlrData.FlySpeed
+				return
+			end
+			ClientRemoteController_Module.Storage.FlySpeed = _G.ClientPlrData.Settings.SelectedFS
+		end
+	end
+end
+local function Use_BulletPunch() --[[ Use_BulletPunch | Line: 925 | Upvalues: t (copy), RemoteEvent (copy), AnimStorage (copy) ]]
+	local v1 = time() - t.bulletPunch
+	local v2 = if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.25 else 0.5
+	if not (v2 <= v1 and (Character and (Character:FindFirstChild("HumanoidRootPart") and (_G.ClientPlrData.FistStrength >= 100000 and (_G.ClientPlrData.QuestData.MainQuest.No >= 11 and (mouse and mouse.hit)))))) then
+		return
+	end
+	t.bulletPunch = time()
+	if not Flying and (mouse and mouse.Hit) then
+		local hit = mouse.hit
+		if Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and hit)) then
+			local v3 = HumanoidRootPart
+			v3.CFrame = CFrame.new(HumanoidRootPart.Position, (Vector3.new(hit.Position.X, HumanoidRootPart.Position.Y, hit.Position.Z)))
+		end
+	end
+	if Combat_FirstPunch then
+		Combat_FirstPunch = false
+		RemoteEvent:FireServer({ "Skill_BulletPunch", "Left", mouse.hit.p })
+		if Landed then
+			PlayAnim(AnimStorage:WaitForChild("BulletPunch2Anim"))
+			return
+		end
+		PlayAnim(AnimStorage:WaitForChild("BulletPunch2_AirAnim"))
+	else
+		Combat_FirstPunch = true
+		RemoteEvent:FireServer({ "Skill_BulletPunch", "Right", mouse.hit.p })
+		if Landed then
+			PlayAnim(AnimStorage:WaitForChild("BulletPunch1Anim"))
+		else
+			PlayAnim(AnimStorage:WaitForChild("BulletPunch1_AirAnim"))
+		end
+	end
+end
+local function Use_Teleport() --[[ Use_Teleport | Line: 953 | Upvalues: t (copy), RemoteEvent (copy), ClientRemoteController_Module (copy) ]]
+	local v1 = time() - t.teleport
+	local v2 = if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1
+	if v2 <= v1 and (Character and (Character:FindFirstChild("HumanoidRootPart") and (_G.ClientPlrData.MovementSpeed >= 10000 and (_G.ClientPlrData.QuestData.MainQuest.No >= 9 and not SoulAttacking)))) then
+		local magnitude = (HumanoidRootPart.CFrame.p - mouse.Hit.p).magnitude
+		if mouse and mouse.Target then
+			t.teleport = time()
+			RemoteEvent:FireServer({ "Skill_Teleport", mouse.Hit.p })
+			return
+		end
+		if mouse and not mouse.Target then
+			t.teleport = time()
+			RemoteEvent:FireServer({ "Skill_Teleport", mouse.Hit.p, true })
+		end
+	else
+		if not (CanTeleport and SoulAttacking) then
+			return
+		end
+		WarnTxt.Text = "Can\'t use with soul attack!"
+		ClientRemoteController_Module.PopUpAndAutoHideGui(WarnTxt, 1)
+	end
+end
+local function Use_Attack() --[[ Use_Attack | Line: 972 | Upvalues: t (copy), RemoteEvent (copy), AnimStorage (copy) ]]
+	local v1 = time() - t.punch
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.25 else 0.5) <= v1) then
+		return
+	end
+	t.punch = time()
+	if Combat_FirstPunch then
+		if not CanPunch then
+			return
+		end
+		Combat_FirstPunch = false
+		RemoteEvent:FireServer({ "Skill_Punch", "Left" })
+		if Landed then
+			PlayAnim(AnimStorage:WaitForChild("Punch2Anim"))
+			return
+		end
+		PlayAnim(AnimStorage:WaitForChild("Punch2_AirAnim"))
+	else
+		Combat_FirstPunch = true
+		RemoteEvent:FireServer({ "Skill_Punch", "Right" })
+		if Landed then
+			PlayAnim(AnimStorage:WaitForChild("Punch1Anim"))
+		else
+			PlayAnim(AnimStorage:WaitForChild("Punch1_AirAnim"))
+		end
+	end
+end
+local function Use_Invisibility() --[[ Use_Invisibility | Line: 994 | Upvalues: t (copy), IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy), ClientRemoteController_Module (copy) ]]
+	local v1 = time() - t.invisible
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1) <= v1) then
+		return
+	end
+	if _G.ClientPlrData.PsychicPower >= 100 and (_G.ClientPlrData.QuestData.MainQuest.No >= 4 and (not SoulAttacking and IsAlive(LocalPlayer))) then
+		t.invisible = time()
+		RemoteEvent:FireServer({ "Skill_Invisible" })
+		return
+	end
+	if not SoulAttacking then
+		return
+	end
+	ErrorSound:Play()
+	WarnTxt.Text = "Can\'t use with soul attack!"
+	ClientRemoteController_Module.PopUpAndAutoHideGui(WarnTxt, 1)
+end
+local function Use_SpherePunch() --[[ Use_SpherePunch | Line: 1010 | Upvalues: t (copy), AnimStorage (copy), RemoteEvent (copy) ]]
+	local v1 = time() - t.spherePunch
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1) <= v1 and (_G.ClientPlrData.FistStrength >= 1000 and (_G.ClientPlrData.QuestData.MainQuest.No >= 5 and (mouse and mouse.hit)))) then
+		return
+	end
+	t.spherePunch = time()
+	if not Flying then
+		local hit = mouse.hit
+		if Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and hit)) then
+			local v3 = HumanoidRootPart
+			v3.CFrame = CFrame.new(HumanoidRootPart.Position, (Vector3.new(hit.Position.X, HumanoidRootPart.Position.Y, hit.Position.Z)))
+		end
+	end
+	if Landed then
+		PlayAnim(AnimStorage:WaitForChild("SpherePunchAnim"))
+	else
+		PlayAnim(AnimStorage:WaitForChild("SpherePunch_AirAnim"))
+	end
+	RemoteEvent:FireServer({ "Skill_SpherePunch", mouse.hit.p })
+end
+local function Use_SoulAttack() --[[ Use_SoulAttack | Line: 1028 | Upvalues: t (copy), LocalPlayer (copy), GetPlrFromTouchedPart (copy), IsAlive (copy), RemoteEvent (copy), TargetLock (copy), ClientRemoteController_Module (copy) ]]
+	local v1 = time() - t.soulAttack
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1) <= v1) then
+		return
+	end
+	if SoulAttacking or not (_G.ClientPlrData.QuestData.MainQuest.No >= 12 and (mouse and (mouse.Target and (_G.ClientPlrData.PsychicPower / 10000 > LocalPlayer:DistanceFromCharacter(mouse.Target.Position) and LocalPlayer:DistanceFromCharacter(mouse.Target.Position) <= 500)))) then
+		if SoulAttacking or not (_G.ClientPlrData.QuestData.MainQuest.No >= 12 and (mouse and (mouse.Target and (_G.ClientPlrData.PsychicPower / 10000 < LocalPlayer:DistanceFromCharacter(mouse.Target.Position) or LocalPlayer:DistanceFromCharacter(mouse.Target.Position) > 500)))) then
+			return
+		end
+		WarnTxt.Text = "too far to attack!"
+		ClientRemoteController_Module.PopUpAndAutoHideGui(WarnTxt, 1)
+	else
+		local v3 = GetPlrFromTouchedPart(mouse.Target, true, LocalPlayer)
+		if v3 and (v3 ~= LocalPlayer and (IsAlive(v3) and not v3.Character:FindFirstChildOfClass("ForceField"))) then
+			t.soulAttack = time()
+			SoulAttacking = true
+			RemoteEvent:FireServer({ "Skill_SoulAttack_Start", v3 })
+			SoulAttack_Target = v3.Character.HumanoidRootPart
+			RunService:BindToRenderStep("TargetLock", 500, TargetLock)
+			return
+		end
+		if not v3 or (v3 == LocalPlayer or not (v3.Character and v3.Character:FindFirstChild("SafeZoneShield"))) then
+			return
+		end
+		if SafeZoneTxt.Text == "Can\'t Attack People in Safe Zone!" and SafeZoneTxt.Visible == true then
+			return
+		end
+		SafeZoneTxt.Text = "Can\'t Attack People in Safe Zone!"
+		SafeZoneTxt.Visible = true
+		wait(2)
+		if SafeZoneTxt.Text == "Can\'t Attack People in Safe Zone!" then
+			SafeZoneTxt.Visible = false
+		end
+	end
+end
+local function Use_ConcealRevealAura() --[[ Use_ConcealRevealAura | Line: 1064 | Upvalues: t (copy), RemoteEvent (copy) ]]
+	local v1 = time() - t.concealAura
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.25 else 0.5) <= v1 and _G.ClientPlrData.QuestData.MainQuest.No >= 13) then
+		return
+	end
+	t.concealAura = time()
+	RemoteEvent:FireServer({ "ConcealRevealAura" })
+end
+local function Use_KillingIntent() --[[ Use_KillingIntent | Line: 1072 | Upvalues: t (copy), AnimStorage (copy), RemoteEvent (copy) ]]
+	local v1 = time() - t.killingIntent
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.1 else 0.2) <= v1 and (_G.ClientPlrData.PsychicPower >= 100000000 and _G.ClientPlrData.QuestData.MainQuest.No >= 14)) then
+		return
+	end
+	t.killingIntent = time()
+	if Character and not (Character:FindFirstChild("KillingIntentPart") or Character:FindFirstChildOfClass("ForceField")) then
+		if Character:FindFirstChild("SafeZoneShield") then
+			RemoteEvent:FireServer({ "Skill_KillingIntent_Start" })
+			return
+		end
+		PlayAnim(AnimStorage:WaitForChild("KillingIntentAttackerAnim"))
+		RemoteEvent:FireServer({ "Skill_KillingIntent_Start" })
+	else
+		if not (Character and Character:FindFirstChild("KillingIntentPart")) then
+			return
+		end
+		RemoteEvent:FireServer({ "Skill_KillingIntent_End" })
+	end
+end
+local function Use_SoulReap() --[[ Use_SoulReap | Line: 1087 | Upvalues: t (copy), GetPlrFromTouchedPart (copy), LocalPlayer (copy), IsAlive (copy), RemoteEvent (copy) ]]
+	local v1 = time() - t.soulReap
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1) <= v1 and (_G.ClientPlrData.QuestData.GrimQuest.No >= 2 and (mouse and (mouse.hit and mouse.Target)))) then
+		return
+	end
+	local v3 = GetPlrFromTouchedPart(mouse.Target, true, LocalPlayer)
+	if v3 and (v3 ~= LocalPlayer and (IsAlive(v3) and not v3.Character:FindFirstChildOfClass("ForceField"))) then
+		t.soulReap = time()
+		if Flying then
+			RemoteEvent:FireServer({ "Skill_SoulReap", v3 })
+			return
+		end
+		local hit = mouse.hit
+		if not (Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and hit))) then
+			RemoteEvent:FireServer({ "Skill_SoulReap", v3 })
+			return
+		end
+		local v4 = HumanoidRootPart
+		v4.CFrame = CFrame.new(HumanoidRootPart.Position, (Vector3.new(hit.Position.X, HumanoidRootPart.Position.Y, hit.Position.Z)))
+		RemoteEvent:FireServer({ "Skill_SoulReap", v3 })
+	else
+		if not v3 or (v3 == LocalPlayer or not (v3.Character and v3.Character:FindFirstChild("SafeZoneShield"))) then
+			return
+		end
+		if SafeZoneTxt.Text == "Can\'t Attack People in Safe Zone!" and SafeZoneTxt.Visible == true then
+			return
+		end
+		SafeZoneTxt.Text = "Can\'t Attack People in Safe Zone!"
+		SafeZoneTxt.Visible = true
+		wait(2)
+		if SafeZoneTxt.Text ~= "Can\'t Attack People in Safe Zone!" then
+			return
+		end
+		SafeZoneTxt.Visible = false
+	end
+end
+local function Use_Hellfire() --[[ Use_Hellfire | Line: 1112 | Upvalues: t (copy), GetPlrFromTouchedPart (copy), LocalPlayer (copy), IsAlive (copy), AnimStorage (copy), RemoteEvent (copy) ]]
+	local v1 = time() - t.hellfire
+	if not ((if _G.ClientPlrData.Inventory.x2SkillSpeed then 0.5 else 1) <= v1 and (_G.ClientPlrData.Inventory.GhostRiderPass and (mouse and mouse.hit))) then
+		return
+	end
+	local v3 = GetPlrFromTouchedPart(mouse.Target, true, LocalPlayer)
+	if v3 and (v3 ~= LocalPlayer and (IsAlive(v3) and not v3.Character:FindFirstChildOfClass("ForceField"))) then
+		t.hellfire = time()
+		if Flying then
+			PlayAnim(AnimStorage:WaitForChild("HellFireAnim"))
+			RemoteEvent:FireServer({ "Skill_Hellfire", v3 })
+			return
+		end
+		local hit = mouse.hit
+		if not (Humanoid and (Humanoid.Health > 0 and (HumanoidRootPart and hit))) then
+			PlayAnim(AnimStorage:WaitForChild("HellFireAnim"))
+			RemoteEvent:FireServer({ "Skill_Hellfire", v3 })
+			return
+		end
+		local v4 = HumanoidRootPart
+		v4.CFrame = CFrame.new(HumanoidRootPart.Position, (Vector3.new(hit.Position.X, HumanoidRootPart.Position.Y, hit.Position.Z)))
+		PlayAnim(AnimStorage:WaitForChild("HellFireAnim"))
+		RemoteEvent:FireServer({ "Skill_Hellfire", v3 })
+	else
+		if not v3 or (v3 == LocalPlayer or not (v3.Character and v3.Character:FindFirstChild("SafeZoneShield"))) then
+			return
+		end
+		if SafeZoneTxt.Text == "Can\'t Attack People in Safe Zone!" and SafeZoneTxt.Visible == true then
+			return
+		end
+		SafeZoneTxt.Text = "Can\'t Attack People in Safe Zone!"
+		SafeZoneTxt.Visible = true
+		wait(2)
+		if SafeZoneTxt.Text ~= "Can\'t Attack People in Safe Zone!" then
+			return
+		end
+		SafeZoneTxt.Visible = false
+	end
+end
+local v6 = 0
+local v7 = 0
+local v8 = 0
+wUp = true
+aUp = true
+sUp = true
+dUp = true
+eUp = true
+qUp = true
+local v9 = 0
+function FlyFunc() --[[ FlyFunc | Line: 1149 | Upvalues: v7 (ref), v6 (ref), v8 (ref), ClientRemoteController_Module (copy), v9 (ref) ]]
+	local FlyBodyVel = Instance.new("BodyVelocity")
+	FlyBodyVel.Name = "FlyBodyVel"
+	FlyBodyVel.MaxForce = Vector3.new(inf, inf, inf)
+	FlyBodyVel.Velocity = Vector3.new(0, 0, 0)
+	local FlyBodyGyro = Instance.new("BodyGyro")
+	FlyBodyGyro.Name = "FlyBodyGyro"
+	FlyBodyGyro.MaxTorque = Vector3.new(inf, inf, inf)
+	FlyBodyGyro.D = 100
+	FlyBodyGyro.P = 20000
+	FlyBodyGyro.CFrame = HumanoidRootPart.CFrame
+	FlyBodyVel.Parent = HumanoidRootPart
+	FlyBodyGyro.Parent = HumanoidRootPart
+	FlyRunService = RunService.RenderStepped:Connect(function() --[[ Line: 1164 | Upvalues: FlyBodyGyro (copy), v7 (ref), v6 (ref), v8 (ref), FlyBodyVel (copy), ClientRemoteController_Module (ref), v9 (ref) ]]
+		FlyBodyGyro.CFrame = CurrentCamera.CFrame
+		if v7 == 0 then
+			if v6 == 0 and v8 == 0 then
+				FlyBodyVel.Velocity = Vector3.new(0, 0, 0)
+				if v9 > 0 then
+					v9 = 1
+				end
+			else
+				FlyBodyVel.Velocity = CFrame.new(CurrentCamera.CFrame.p, (CurrentCamera.CFrame * CFrame.new(v6, 0, v8)).p).lookVector * ClientRemoteController_Module.Storage.FlySpeed
+				if v9 < 3 then
+					v9 = 2
+				end
+			end
+		else
+			FlyBodyVel.Velocity = CFrame.new(CurrentCamera.CFrame.p, (CurrentCamera.CFrame * CFrame.new(v6, v7, v8)).p).lookVector * ClientRemoteController_Module.Storage.FlySpeed
+			if v9 < 3 then
+				v9 = 2
+			end
+		end
+		if wUp and (aUp and (sUp and (dUp and (eUp and (qUp and (v6 ~= 0 or (v7 ~= 0 or v8 ~= 0))))))) then
+			v6 = 0
+			v7 = 0
+			v8 = 0
+			FlyBodyVel.Velocity = Vector3.new(0, 0, 0)
+			if v9 > 0 then
+				v9 = 1
+			end
+		end
+		if Flying then
+			return
+		end
+		FlyRunService:Disconnect()
+	end)
+end
+local function SetUp_TouchDevice_SkillGui(p1, p2) --[[ SetUp_TouchDevice_SkillGui | Line: 1199 | Upvalues: v4 (ref) ]]
+	if v4 == p1 then
+		v4 = ""
+		for k, v in pairs(_G.ClientPlrData.TouchDevice_Hotkeys) do
+			if (k == "SpherePunch" or (k == "Teleport" or (k == "BulletPunch" or (k == "SoulAttack" or (k == "SoulReap" or k == "Hellfire"))))) and skillHotkey_Frame:FindFirstChild("TxtBtn_" .. v) then
+				skillHotkey_Frame["TxtBtn_" .. v].BorderColor3 = Color3.fromRGB(29, 29, 29)
+				skillHotkey_Frame["TxtBtn_" .. v].Info_Txt.TextColor3 = Color3.fromRGB(255, 193, 5)
+			end
+		end
+	else
+		v4 = p1
+		for k, v in pairs(_G.ClientPlrData.TouchDevice_Hotkeys) do
+			if (k == "SpherePunch" or (k == "Teleport" or (k == "BulletPunch" or (k == "SoulAttack" or (k == "SoulReap" or k == "Hellfire"))))) and (skillHotkey_Frame:FindFirstChild("TxtBtn_" .. v) and skillHotkey_Frame["TxtBtn_" .. v] ~= p2) then
+				skillHotkey_Frame["TxtBtn_" .. v].BorderColor3 = Color3.fromRGB(29, 29, 29)
+				skillHotkey_Frame["TxtBtn_" .. v].Info_Txt.TextColor3 = Color3.fromRGB(255, 193, 5)
+			end
+		end
+		p2.BorderColor3 = Color3.fromRGB(255, 206, 128)
+		p2.Info_Txt.TextColor3 = Color3.fromRGB(255, 155, 0)
+	end
+end
+Combat_FirstPunch = false
+CanPunch = true
+CanBeInvisible = true
+CanSpherePunch = true
+CanSoulReap = true
+CanUseDevilFlame = true
+CanTeleport = true
+CanBulletPunch = true
+Invisible = false
+CanConcealAura = true
+CanSoulAttack = true
+CanKillingIntent = true
+SoulAttacking = false
+local v10 = true
+local function SetUp_TouchDevice_Fly() --[[ SetUp_TouchDevice_Fly | Line: 1310 | Upvalues: LocalPlayer (copy), v6 (ref), AnimStorage (copy), v8 (ref), v10 (ref) ]]
+	if not (LocalPlayer:FindFirstChild("PlayerScripts") and (LocalPlayer.PlayerScripts:FindFirstChild("PlayerModule") and (LocalPlayer.PlayerScripts.PlayerModule:FindFirstChild("ControlModule") and (LocalPlayer:FindFirstChild("PlayerGui") and (LocalPlayer.PlayerGui:FindFirstChild("TouchGui") and (LocalPlayer.PlayerGui.TouchGui:FindFirstChild("TouchControlFrame") and LocalPlayer.PlayerGui.TouchGui.TouchControlFrame:FindFirstChild("JumpButton"))))))) then
+		return
+	end
+	local ControlModule = require(LocalPlayer.PlayerScripts.PlayerModule.ControlModule)
+	LocalPlayer.PlayerGui.TouchGui.TouchControlFrame.JumpButton.MouseButton1Down:Connect(function() --[[ Line: 1319 ]]
+		onJumpRequest()
+	end)
+	local v1 = nil
+	local v2 = nil
+	local v3 = nil
+	local v4 = nil
+	local function f5() --[[ Line: 1326 | Upvalues: ControlModule (copy), v6 (ref), v1 (ref), AnimStorage (ref), v2 (ref), v8 (ref), v3 (ref), v4 (ref) ]]
+		while wait(0.1) do
+			local v12 = ControlModule:GetMoveVector()
+			if v12.X == 0 and v12.Z == 0 then
+				v6 = 0
+				dUp = true
+				if Flying and v1 then
+					v1 = false
+					StopAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+				end
+				v6 = 0
+				aUp = true
+				if Flying and v2 then
+					v2 = false
+					StopAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+				end
+				v8 = 0
+				wUp = true
+				if Flying and v3 then
+					v3 = false
+					StopAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+				end
+				v8 = 0
+				sUp = true
+				if Flying and v4 then
+					v4 = false
+					StopAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+				end
+				continue
+			end
+			local v22 = math.abs(v12.Z)
+			if math.abs(v12.X) < v22 then
+				v6 = 0
+				dUp = true
+				if Flying and v1 then
+					v1 = false
+					StopAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+				end
+				v6 = 0
+				aUp = true
+				if Flying and v2 then
+					v2 = false
+					StopAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+				end
+				if v12.Z < 0 then
+					v8 = -1
+					wUp = false
+					if Flying and not v3 then
+						v3 = true
+						PlayAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+					end
+				else
+					if sUp then
+						v8 = 0
+					end
+					wUp = true
+					if Flying and v3 then
+						v3 = false
+						StopAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+					end
+				end
+				if v12.Z > 0 then
+					v8 = 1
+					sUp = false
+					if Flying and not v4 then
+						v4 = true
+						PlayAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+					end
+					continue
+				end
+				if wUp then
+					v8 = 0
+				end
+				sUp = true
+				if Flying and v4 then
+					v4 = false
+					StopAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+				end
+				continue
+			end
+			v8 = 0
+			wUp = true
+			if Flying and v3 then
+				v3 = false
+				StopAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+			end
+			v8 = 0
+			sUp = true
+			if Flying and v4 then
+				v4 = false
+				StopAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+			end
+			if v12.X > 0 then
+				v6 = 1
+				dUp = false
+				if Flying and not v1 then
+					v1 = true
+					PlayAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+				end
+			else
+				if aUp then
+					v6 = 0
+				end
+				dUp = true
+				if Flying and v1 then
+					v1 = false
+					StopAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+				end
+			end
+			if v12.X < 0 then
+				v6 = -1
+				aUp = false
+				if Flying and not v2 then
+					v2 = true
+					PlayAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+				end
+				continue
+			end
+			if dUp then
+				v6 = 0
+			end
+			aUp = true
+			if not (Flying and v2) then
+				continue
+			end
+			v2 = false
+			StopAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+		end
+	end
+	coroutine.resume(coroutine.create(f5))
+	v10 = false
+end
+if not UserInputService.MouseEnabled and UserInputService.TouchEnabled then
+	_G.IsMobile = true
+end
+if _G.IsMobile then
+	SetUp_TouchDevice_Fly()
+	local v11
+	if ScreenGui.AbsoluteSize.Y < 500 then
+		skillHotkey_Frame:WaitForChild("UIListLayout").Padding = UDim.new(0.07, 0)
+		skillHotkey_Frame.Visible = true
+		MenuFrame.Position = UDim2.new(0.5, 0, 0.15, 0)
+		MenuFrame.Size = UDim2.new(0.4, 0, 0.625, 0)
+		v11 = 2
+	else
+		skillHotkey_Frame:WaitForChild("UIListLayout").Padding = UDim.new(0.085, 0)
+		skillHotkey_Frame.Position = UDim2.new(0.5, 0, 0.85, 0)
+		skillHotkey_Frame.Size = UDim2.new(0.5, 0, 0.05, 0)
+		skillHotkey_Frame.Visible = true
+		MenuFrame.Size = UDim2.new(0.45, 0, 0.5, 0)
+		v11 = 4
+	end
+	desktop = false
+	UserInputService.TouchStarted:Connect(function(p1, p2) --[[ Line: 1532 | Upvalues: v4 (ref), Use_SpherePunch (copy), Use_Teleport (copy), Use_BulletPunch (copy), Use_SoulAttack (copy), Use_SoulReap (copy), Use_Hellfire (copy) ]]
+		if p2 or (TalkingOnQuest or (not Character or (not Humanoid or (Humanoid.Health <= 0 or (not Character:IsDescendantOf(workspace) or Humanoid:GetState() == Enum.HumanoidStateType.Dead))))) then
+			return
+		end
+		if _G.ClientPlrData.Current_AFK_Training_Anim and _G.ClientPlrData.Current_AFK_Training_Anim.IsPlaying then
+			_G.ClientPlrData.Current_AFK_Training_Anim:Stop()
+		end
+		if v4 == "" then
+			return
+		end
+		if v4 == "SP" then
+			Use_SpherePunch()
+			return
+		end
+		if v4 == "TP" then
+			Use_Teleport()
+			return
+		end
+		if v4 == "BP" then
+			Use_BulletPunch()
+			return
+		end
+		if v4 == "SA" then
+			Use_SoulAttack()
+			return
+		end
+		if v4 == "SR" then
+			Use_SoulReap()
+			return
+		end
+		if v4 ~= "HF" then
+			return
+		end
+		Use_Hellfire()
+	end)
+	UserInputService.TouchEnded:Connect(function(p1, p2) --[[ Line: 1559 | Upvalues: RemoteEvent (copy) ]]
+		if not SoulAttacking then
+			return
+		end
+		RemoteEvent:FireServer({ "Skill_SoulAttack_End" })
+		RunService:UnbindFromRenderStep("TargetLock")
+		SoulAttack_Target = nil
+		SoulAttacking = false
+	end)
+	for i, v in ipairs(skillHotkey_Frame:GetChildren()) do
+		if v:IsA("TextButton") then
+			v.BorderSizePixel = v11
+			v.Activated:Connect(function() --[[ Line: 1571 | Upvalues: v (copy), Use_LeftCtrl (copy), Use_Attack (copy), Use_Invisibility (copy), SetUp_TouchDevice_SkillGui (copy), Use_ConcealRevealAura (copy), Use_KillingIntent (copy) ]]
+				if TalkingOnQuest or (not Character or (not Humanoid or (Humanoid.Health <= 0 or (not Character:IsDescendantOf(workspace) or Humanoid:GetState() == Enum.HumanoidStateType.Dead)))) then
+					return
+				end
+				for k, v2 in pairs(_G.ClientPlrData.TouchDevice_Hotkeys) do
+					if v2 == string.match(v.Name, "%d+") then
+						if k == "WalkRunToggle" then
+							Use_LeftCtrl()
+							continue
+						end
+						if k == "Punch" then
+							Use_Attack()
+							continue
+						end
+						if k == "Invisibility" then
+							Use_Invisibility()
+							continue
+						end
+						if k == "SpherePunch" then
+							SetUp_TouchDevice_SkillGui("SP", v)
+							continue
+						end
+						if k == "Teleport" then
+							SetUp_TouchDevice_SkillGui("TP", v)
+							continue
+						end
+						if k == "BulletPunch" then
+							SetUp_TouchDevice_SkillGui("BP", v)
+							continue
+						end
+						if k == "SoulAttack" then
+							SetUp_TouchDevice_SkillGui("SA", v)
+							continue
+						end
+						if k == "AuraToggle" then
+							Use_ConcealRevealAura()
+							continue
+						end
+						if k == "KillingIntentAura" then
+							Use_KillingIntent()
+							continue
+						end
+						if k == "SoulReap" then
+							SetUp_TouchDevice_SkillGui("SR", v)
+							continue
+						end
+						if k == "Hellfire" then
+							SetUp_TouchDevice_SkillGui("HF", v)
+						end
+					end
+				end
+			end)
+		end
+	end
+	skillHotkey_Frame.Visible = true
+else
+	local v12 = 0
+	UserInputService.InputBegan:Connect(function(p1, p2) --[[ Line: 1610 | Upvalues: v8 (ref), AnimStorage (copy), v6 (ref), v7 (ref), v12 (ref), Use_LeftCtrl (copy), Use_BulletPunch (copy), Use_Teleport (copy), Use_Attack (copy), Use_Invisibility (copy), Use_SpherePunch (copy), Use_SoulAttack (copy), Use_KillingIntent (copy), Use_SoulReap (copy), Use_Hellfire (copy), Use_ConcealRevealAura (copy), v2 (ref), v3 (ref), RemoteEvent (copy) ]]
+		if p2 then
+			if not (v2 and v3) then
+				return
+			end
+			v2 = false
+			if v3:FindFirstChild("SkillName") and p1.KeyCode ~= Enum.KeyCode.Unknown then
+				RemoteEvent:FireServer({ "Register_Hotkey_Request", p1.KeyCode, v3.SkillName.Value })
+			else
+				if not v3:FindFirstChild("DefaultKey") then
+					v3:ReleaseFocus()
+					return
+				end
+				v3.Text = if v3.DefaultKey.Value == "" then "" else "\"" .. v3.DefaultKey.Value .. "\"" or ""
+			end
+			v3:ReleaseFocus()
+			return
+		end
+		if _G.ClientPlrData.Current_AFK_Training_Anim and (_G.ClientPlrData.Current_AFK_Training_Anim.IsPlaying and (p1.UserInputType ~= Enum.UserInputType.MouseButton1 and (p1.UserInputType ~= Enum.UserInputType.MouseButton2 and (p1.UserInputType ~= Enum.UserInputType.MouseButton3 and (p1.UserInputType ~= Enum.UserInputType.MouseWheel and (p1.UserInputType ~= Enum.UserInputType.MouseMovement and (p1.KeyCode ~= Enum.KeyCode.Escape and (p1.KeyCode ~= Enum.KeyCode.Tab and (p1.KeyCode ~= Enum.KeyCode.CapsLock and (p1.KeyCode ~= Enum.KeyCode.LeftShift and (p1.KeyCode ~= Enum.KeyCode.RightShift and (p1.KeyCode ~= Enum.KeyCode.LeftControl and (p1.KeyCode ~= Enum.KeyCode.RightControl and (p1.KeyCode ~= Enum.KeyCode.LeftAlt and (p1.KeyCode ~= Enum.KeyCode.RightAlt and (p1.KeyCode ~= Enum.KeyCode.Backspace and (p1.KeyCode ~= Enum.KeyCode.Return and (p1.KeyCode ~= Enum.KeyCode.NumLock and (p1.KeyCode ~= Enum.KeyCode.Slash and p1.KeyCode ~= Enum.KeyCode.Tilde))))))))))))))))))) then
+			_G.ClientPlrData.Current_AFK_Training_Anim:Stop()
+		end
+		local KeyCode = p1.KeyCode
+		if KeyCode == Enum.KeyCode.W then
+			v8 = -1
+			wUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+			end
+		elseif KeyCode == Enum.KeyCode.A then
+			v6 = -1
+			aUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+			end
+		elseif KeyCode == Enum.KeyCode.S then
+			v8 = 1
+			sUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+			end
+		elseif KeyCode == Enum.KeyCode.D then
+			v6 = 1
+			dUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+			end
+		elseif KeyCode == Enum.KeyCode.E then
+			v7 = 1
+			eUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyUpAnim"))
+			end
+		elseif KeyCode == Enum.KeyCode.Q then
+			v7 = -1
+			qUp = false
+			if Flying then
+				PlayAnim(AnimStorage:WaitForChild("FlyDownAnim"))
+			end
+		end
+		if Flying and (v6 ~= 0 or (v7 ~= 0 or v8 ~= 0)) and v12 ~= 1 then
+			v12 = 1
+		end
+		if TalkingOnQuest then
+			if KeyCode == Enum.KeyCode.Space then
+				QuestTalkFunc()
+			end
+		else
+			if not Character or (not Humanoid or (Humanoid.Health <= 0 or (not Character:IsDescendantOf(workspace) or Humanoid:GetState() == Enum.HumanoidStateType.Dead))) then
+				return
+			end
+			if KeyCode == Enum.KeyCode.Space then
+				onJumpRequest()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.WalkRunToggle ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.WalkRunToggle] then
+				Use_LeftCtrl()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.BulletPunch ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.BulletPunch] then
+				Use_BulletPunch()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.Teleport ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.Teleport] then
+				Use_Teleport()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.Punch ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.Punch] then
+				Use_Attack()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.Invisibility ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.Invisibility] then
+				Use_Invisibility()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.SpherePunch ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.SpherePunch] then
+				Use_SpherePunch()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.SoulAttack ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.SoulAttack] then
+				Use_SoulAttack()
+				return
+			end
+			if KeyCode == Enum.KeyCode.M then
+				MenuOpenFrameFunc(MenuFrame:WaitForChild("InfoFrame"))
+				OpenOrCloseGuiFunc(MenuFrame)
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.KillingIntentAura ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.KillingIntentAura] then
+				Use_KillingIntent()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.SoulReap ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.SoulReap] then
+				Use_SoulReap()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.Hellfire ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.Hellfire] then
+				Use_Hellfire()
+				return
+			end
+			if _G.ClientPlrData.Hotkeys.AuraToggle ~= "" and KeyCode == Enum.KeyCode[_G.ClientPlrData.Hotkeys.AuraToggle] then
+				Use_ConcealRevealAura()
+			end
+		end
+	end)
+	UserInputService.InputEnded:Connect(function(p1, p2) --[[ Line: 1731 | Upvalues: v8 (ref), AnimStorage (copy), v6 (ref), v7 (ref), v12 (ref), RemoteEvent (copy) ]]
+		local KeyCode = p1.KeyCode
+		if not p2 then
+			if KeyCode == Enum.KeyCode.W then
+				if sUp then
+					v8 = 0
+				end
+				wUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyForwardAnim"))
+				end
+			elseif KeyCode == Enum.KeyCode.A then
+				if dUp then
+					v6 = 0
+				end
+				aUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyLeftAnim"))
+				end
+			elseif KeyCode == Enum.KeyCode.S then
+				if wUp then
+					v8 = 0
+				end
+				sUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyBackAnim"))
+				end
+			elseif KeyCode == Enum.KeyCode.D then
+				if aUp then
+					v6 = 0
+				end
+				dUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyRightAnim"))
+				end
+			elseif KeyCode == Enum.KeyCode.E then
+				if qUp then
+					v7 = 0
+				end
+				eUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyUpAnim"))
+				end
+			elseif KeyCode == Enum.KeyCode.Q then
+				if eUp then
+					v7 = 0
+				end
+				qUp = true
+				if Flying then
+					StopAnim(AnimStorage:WaitForChild("FlyDownAnim"))
+				end
+			end
+			if v6 == 0 and (v7 == 0 and (v8 == 0 and v12 ~= 0)) then
+				v12 = 0
+			end
+		end
+		if _G.ClientPlrData.Hotkeys.SoulAttack == "" or (KeyCode ~= Enum.KeyCode[_G.ClientPlrData.Hotkeys.SoulAttack] or not SoulAttacking) then
+			return
+		end
+		RemoteEvent:FireServer({ "Skill_SoulAttack_End" })
+		RunService:UnbindFromRenderStep("TargetLock")
+		SoulAttack_Target = nil
+		SoulAttacking = false
+	end)
+end
+local v13 = false
+IntroGui:WaitForChild("PlayBtn").Activated:Connect(function() --[[ Line: 1810 | Upvalues: v13 (ref), RemoteEvent (copy) ]]
+	if not (IntroGui.PlayBtn.BackgroundTransparency <= 0.21) or IntroGui.PlayBtn.TextTransparency ~= 0 then
+		return
+	end
+	local Blur = Lighting:WaitForChild("Blur")
+	if not v13 then
+		v13 = true
+	end
+	for i = 0, 20 do
+		wait(0.05)
+		for k, v in pairs(IntroGui:GetChildren()) do
+			if v.Name == "PlayBtn" then
+				v.TextTransparency = v.TextTransparency + 0.05
+				v.BackgroundTransparency = v.BackgroundTransparency + 0.05
+				continue
+			end
+			if v.Name == "VersionTxt" then
+				v.TextTransparency = v.TextTransparency + 0.05
+				continue
+			end
+			if v.Name == "ServerAgeTxt" then
+				v.TextTransparency = v.TextTransparency + 0.05
+				continue
+			end
+			if v.Name == "HeaderTxt" then
+				v.TextTransparency = v.TextTransparency + 0.05
+				v.TextStrokeTransparency = v.TextStrokeTransparency + 0.05
+			end
+		end
+		Blur.Size = Blur.Size - 0.5
+	end
+	for k, v in pairs(IntroGui:GetChildren()) do
+		if v.Name == "PlayBtn" then
+			v.TextTransparency = 1
+			v.BackgroundTransparency = 1
+			continue
+		end
+		if v.Name == "VersionTxt" then
+			v.TextTransparency = 1
+			continue
+		end
+		if v.Name == "ServerAgeTxt" then
+			v.TextTransparency = 1
+			continue
+		end
+		if v.Name == "HeaderTxt" then
+			v.TextTransparency = 1
+			v.TextStrokeTransparency = 1
+		end
+	end
+	Blur.Size = 0
+	Blur.Enabled = false
+	IntroGui.Enabled = false
+	ScreenGui.Enabled = true
+	RemoteEvent:FireServer({ "Respawn" })
+end)
+for k, v in pairs(ScreenGui:GetChildren()) do
+	if v.Name == "MenuBtn" then
+		v.Activated:Connect(function() --[[ Line: 1867 ]]
+			MenuOpenFrameFunc(MenuFrame:WaitForChild("InfoFrame"))
+			OpenOrCloseGuiFunc(MenuFrame)
+		end)
+		continue
+	end
+	if v.Name == "WeightFrame" then
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11.Name == "TxtBtn1" then
+				v11.Activated:Connect(function() --[[ Line: 1871 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and (IsAlive(LocalPlayer) and Character:FindFirstChild("SPTS_Weight"))) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 0 })
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn2" then
+				v11.Activated:Connect(function() --[[ Line: 1877 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 1 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn3" then
+				v11.Activated:Connect(function() --[[ Line: 1885 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 2 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn4" then
+				v11.Activated:Connect(function() --[[ Line: 1893 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 3 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn5" then
+				v11.Activated:Connect(function() --[[ Line: 1901 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 4 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn6" then
+				v11.Activated:Connect(function() --[[ Line: 1909 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 5 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn7" then
+				v11.Activated:Connect(function() --[[ Line: 1917 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 6 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn8" then
+				v11.Activated:Connect(function() --[[ Line: 1925 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 7 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn9" then
+				v11.Activated:Connect(function() --[[ Line: 1933 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 8 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn10" then
+				v11.Activated:Connect(function() --[[ Line: 1941 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 9 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn11" then
+				v11.Activated:Connect(function() --[[ Line: 1949 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 10 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn12" then
+				v11.Activated:Connect(function() --[[ Line: 1957 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 11 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn13" then
+				v11.Activated:Connect(function() --[[ Line: 1965 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 12 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn14" then
+				v11.Activated:Connect(function() --[[ Line: 1973 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 13 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn15" then
+				v11.Activated:Connect(function() --[[ Line: 1981 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 14 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn16" then
+				v11.Activated:Connect(function() --[[ Line: 1989 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 15 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn17" then
+				v11.Activated:Connect(function() --[[ Line: 1997 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 16 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn18" then
+				v11.Activated:Connect(function() --[[ Line: 2005 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 17 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn19" then
+				v11.Activated:Connect(function() --[[ Line: 2013 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 18 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn20" then
+				v11.Activated:Connect(function() --[[ Line: 2021 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 19 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn21" then
+				v11.Activated:Connect(function() --[[ Line: 2029 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 20 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn22" then
+				v11.Activated:Connect(function() --[[ Line: 2037 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 21 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn23" then
+				v11.Activated:Connect(function() --[[ Line: 2045 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 22 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn24" then
+				v11.Activated:Connect(function() --[[ Line: 2053 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 23 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+				continue
+			end
+			if v11.Name == "TxtBtn25" then
+				v11.Activated:Connect(function() --[[ Line: 2061 | Upvalues: IsAlive (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+					if not (Character and IsAlive(LocalPlayer)) then
+						return
+					end
+					RemoteEvent:FireServer({ "EquipWeight_Request", 24 })
+					EquipSound:Play()
+					Humanoid:UnequipTools()
+				end)
+			end
+		end
+		continue
+	end
+	if v.Name == "CurrentGemImgBtn" then
+		v.Activated:Connect(function() --[[ Line: 2071 ]]
+			MenuFrame.Visible = true
+			MenuOpenFrameFunc(MenuFrame:WaitForChild("SpecialFrame"))
+		end)
+		v:WaitForChild("AmountTxtBtn").Activated:Connect(function() --[[ Line: 2072 ]]
+			MenuFrame.Visible = true
+			MenuOpenFrameFunc(MenuFrame:WaitForChild("SpecialFrame"))
+		end)
+		v.MouseEnter:Connect(function() --[[ Line: 2073 | Upvalues: v (copy) ]]
+			v:WaitForChild("InfoTxt").Visible = true
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 2074 | Upvalues: v (copy) ]]
+			v:WaitForChild("InfoTxt").Visible = false
+		end)
+		v:WaitForChild("AmountTxtBtn").MouseEnter:Connect(function() --[[ Line: 2075 | Upvalues: v (copy) ]]
+			v:WaitForChild("InfoTxt").Visible = true
+		end)
+		v:WaitForChild("AmountTxtBtn").MouseLeave:Connect(function() --[[ Line: 2076 | Upvalues: v (copy) ]]
+			v:WaitForChild("InfoTxt").Visible = false
+		end)
+		continue
+	end
+	if v.Name == "Gift_Frame" then
+		v:WaitForChild("CloseBtn").Activated:Connect(function() --[[ Line: 2078 ]]
+			gift_Frame.Visible = false
+		end)
+		local Products_Frame = v:WaitForChild("Products_Frame")
+		Products_Frame:WaitForChild("Token_1_Frame"):WaitForChild("GiftBtn1").Activated:Connect(function() --[[ Line: 2082 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 1 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Token_2_Frame"):WaitForChild("GiftBtn2").Activated:Connect(function() --[[ Line: 2092 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 2 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Token_3_Frame"):WaitForChild("GiftBtn3").Activated:Connect(function() --[[ Line: 2102 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 3 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Token_4_Frame"):WaitForChild("GiftBtn4").Activated:Connect(function() --[[ Line: 2112 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 4 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Token_5_Frame"):WaitForChild("GiftBtn5").Activated:Connect(function() --[[ Line: 2122 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 5 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Token_6_Frame"):WaitForChild("GiftBtn6").Activated:Connect(function() --[[ Line: 2132 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftTokens_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 6 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Vip_1_Frame"):WaitForChild("GiftBtn1").Activated:Connect(function() --[[ Line: 2142 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftVip_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 1 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Vip_2_Frame"):WaitForChild("GiftBtn2").Activated:Connect(function() --[[ Line: 2152 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftVip_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 2 })
+				Confirm2Sound:Play()
+			end
+		end)
+		Products_Frame:WaitForChild("Vip_3_Frame"):WaitForChild("GiftBtn3").Activated:Connect(function() --[[ Line: 2162 | Upvalues: Players_2 (copy), RemoteEvent (copy) ]]
+			if gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value == 0 or not Players_2:GetPlayerByUserId(gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value) then
+				ErrorSound:Play()
+			else
+				RemoteEvent:FireServer({ "GiftVip_Request", gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value, 3 })
+				Confirm2Sound:Play()
+			end
+		end)
+		continue
+	end
+	if v.Name == "MenuFrame" then
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11.Name == "InfoBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2185 | Upvalues: v (copy) ]]
+					MenuOpenFrameFunc(v.InfoFrame)
+				end)
+				continue
+			end
+			if v11.Name == "SkillBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2187 | Upvalues: v (copy) ]]
+					if UserInputService.MouseEnabled or not UserInputService.TouchEnabled then
+						MenuOpenFrameFunc(v.SkillFrame)
+						return
+					end
+					_G.IsMobile = true
+					MenuOpenFrameFunc(v.SkillFrame)
+				end)
+				continue
+			end
+			if v11.Name == "SquadBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2194 | Upvalues: v (copy) ]]
+					MenuOpenFrameFunc(v.SquadFrame)
+				end)
+				continue
+			end
+			if v11.Name == "SpecialBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2196 | Upvalues: v (copy) ]]
+					MenuOpenFrameFunc(v.SpecialFrame)
+				end)
+				continue
+			end
+			if v11.Name == "SettingBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2198 | Upvalues: v (copy) ]]
+					MenuOpenFrameFunc(v.SettingFrame)
+				end)
+				continue
+			end
+			if v11.Name == "CloseBtn" then
+				v11.Activated:Connect(function() --[[ Line: 2200 ]]
+					MenuFrame.Visible = false
+				end)
+				continue
+			end
+			if v11.Name == "SquadFrame" then
+				for k3, v12 in pairs(v11:WaitForChild("NoSquad_Frame"):GetChildren()) do
+					if v12.Name == "CreateSquad_Frame" then
+						v12:WaitForChild("CancelTxt_Btn").Activated:Connect(function() --[[ Line: 2218 | Upvalues: v11 (copy), v12 (copy) ]]
+							v11.NoSquad_Frame.CreateSquad_TxtBtn.Active = true
+							v12.Visible = false
+						end)
+						v12:WaitForChild("Create_TxtBtn").Activated:Connect(function() --[[ Line: 2222 | Upvalues: v12 (copy), RemoteEvent (copy), v11 (copy) ]]
+							if v12.TxtBox.Text == "" then
+								return
+							end
+							RemoteEvent:FireServer({ "CreateSquad_Request", v12.TxtBox.Text })
+							v11.NoSquad_Frame.CreateSquad_TxtBtn.Active = true
+							v12.Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "CreateSquad_TxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2230 | Upvalues: v11 (copy) ]]
+							v11.NoSquad_Frame.CreateSquad_TxtBtn.Active = false
+							v11.NoSquad_Frame.CreateSquad_Frame.Visible = true
+						end)
+					end
+				end
+				for k3, v12 in pairs(v11:WaitForChild("HaveSquad_Frame"):GetChildren()) do
+					if v12.Name == "Announce_TxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2238 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+							if v11.HaveSquad_Frame.Announcement_TxtBox.Text == "" then
+								return
+							end
+							RemoteEvent:FireServer({ "AnnounceForSquad_Request", v11.HaveSquad_Frame.Announcement_TxtBox.Text })
+						end)
+						continue
+					end
+					if v12.Name == "Icon_Frame" then
+						v12:WaitForChild("CancelTxt_Btn").Activated:Connect(function() --[[ Line: 2244 | Upvalues: v11 (copy), v12 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						v12:WaitForChild("Apply_TxtBtn").Activated:Connect(function() --[[ Line: 2252 | Upvalues: v12 (copy), RemoteEvent (copy), v11 (copy) ]]
+							if v12.TxtBox.Text == "" then
+								return
+							end
+							RemoteEvent:FireServer({ "ChangeSquadIcon_Request", v12.TxtBox.Text })
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "Invite_Frame" then
+						v12:WaitForChild("TxtBox"):GetPropertyChangedSignal("Text"):Connect(function(p1) --[[ Line: 2264 | Upvalues: v12 (copy), ClientRemoteController_Module (copy), LocalPlayer (copy) ]]
+							v12.TxtBox.Suggestion_Txt.Text = ClientRemoteController_Module.FindBestMatchingPlayerName(v12.TxtBox.Text, LocalPlayer)
+						end)
+						v12:WaitForChild("CancelTxt_Btn").Activated:Connect(function() --[[ Line: 2269 | Upvalues: v11 (copy), v12 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						v12:WaitForChild("Invite_TxtBtn").Activated:Connect(function() --[[ Line: 2277 | Upvalues: v12 (copy), RemoteEvent (copy), v11 (copy) ]]
+							if v12.TxtBox.Suggestion_Txt.Text == "" then
+								return
+							end
+							RemoteEvent:FireServer({ "InviteToSquad_Request", v12.TxtBox.Suggestion_Txt.Text })
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "Icon_TxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2289 | Upvalues: v11 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = false
+								end
+							end
+							v11.HaveSquad_Frame.Icon_Frame.Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "Invite_TxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2298 | Upvalues: v11 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = false
+								end
+							end
+							v11.HaveSquad_Frame.Invite_Frame.Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "LeaveConfirm_Frame" then
+						v12:WaitForChild("CancelTxt_Btn").Activated:Connect(function() --[[ Line: 2307 | Upvalues: v11 (copy), v12 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						v12:WaitForChild("Leave_TxtBtn").Activated:Connect(function() --[[ Line: 2315 | Upvalues: RemoteEvent (copy), v11 (copy), v12 (copy) ]]
+							RemoteEvent:FireServer({ "LeaveFromSquad_Request" })
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = true
+								end
+							end
+							v12.Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "Leave_TxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2325 | Upvalues: v11 (copy) ]]
+							for i, v in ipairs(v11.HaveSquad_Frame:GetChildren()) do
+								if v:IsA("TextButton") then
+									v.Active = false
+								end
+							end
+							v11.HaveSquad_Frame.LeaveConfirm_Frame.Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "MemberTxtBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2334 | Upvalues: v11 (copy) ]]
+							v11.HaveSquad_Frame.MemberList_SF.Visible = not v11.HaveSquad_Frame.MemberList_SF.Visible
+						end)
+					end
+				end
+				continue
+			end
+			if v11.Name == "SkillFrame" then
+				for i, v12 in ipairs(v11:GetDescendants()) do
+					if v12:IsA("TextBox") then
+						v12.Focused:Connect(function() --[[ Line: 2342 | Upvalues: v3 (ref), v12 (copy), v2 (ref) ]]
+							if not UserInputService.MouseEnabled or UserInputService.TouchEnabled then
+								return
+							end
+							wait(0.1)
+							v3 = v12
+							v2 = true
+						end)
+						v12.FocusLost:Connect(function() --[[ Line: 2349 | Upvalues: v12 (copy), RemoteEvent (copy), v2 (ref), v3 (ref) ]]
+							if _G.IsMobile then
+								if v12:FindFirstChild("SkillName") then
+									RemoteEvent:FireServer({ "Register_TouchDevice_Hotkey_Request", v12.Text, v12.SkillName.Value })
+								end
+							else
+								if not v2 or v3 ~= v12 then
+									return
+								end
+								v2 = false
+							end
+						end)
+						local v14 = time()
+						if v12:FindFirstChild("Next_Btn") then
+							v12.Next_Btn.Activated:Connect(function() --[[ Line: 2360 | Upvalues: v14 (copy), RemoteEvent (copy), v12 (copy), MarketplaceService (copy), LocalPlayer (copy) ]]
+								if _G.ClientPlrData.Inventory.Skill_LVL_Selector_Pass then
+									if time() - v14 >= 0.2 then
+										RemoteEvent:FireServer({ "ChangeSkillLVL_Request", v12.SkillName.Value, "Next" })
+									end
+								else
+									MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151818396)
+								end
+							end)
+						end
+						if v12:FindFirstChild("Prev_Btn") then
+							v12.Prev_Btn.Activated:Connect(function() --[[ Line: 2371 | Upvalues: v14 (copy), RemoteEvent (copy), v12 (copy), MarketplaceService (copy), LocalPlayer (copy) ]]
+								if _G.ClientPlrData.Inventory.Skill_LVL_Selector_Pass then
+									if time() - v14 >= 0.2 then
+										RemoteEvent:FireServer({ "ChangeSkillLVL_Request", v12.SkillName.Value, "Prev" })
+									end
+								else
+									MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151818396)
+								end
+							end)
+						end
+					end
+				end
+				continue
+			end
+			if v11.Name == "SpecialFrame" then
+				for k3, v12 in pairs(v11:GetChildren()) do
+					if v12.Name == "BuyBtn1" then
+						v12.Activated:Connect(function() --[[ Line: 2386 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[1])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn2" then
+						v12.Activated:Connect(function() --[[ Line: 2397 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[2])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn3" then
+						v12.Activated:Connect(function() --[[ Line: 2408 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[3])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn4" then
+						v12.Activated:Connect(function() --[[ Line: 2419 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[4])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn5" then
+						v12.Activated:Connect(function() --[[ Line: 2430 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[5])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn6" then
+						v12.Activated:Connect(function() --[[ Line: 2441 | Upvalues: MarketplaceService (copy), LocalPlayer (copy), ClientRemoteController_Module (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, ClientRemoteController_Module.GAME_CONFIG.BuyToken_ID[6])
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn7" then
+						v12.Activated:Connect(function() --[[ Line: 2452 | Upvalues: MarketplaceService (copy), LocalPlayer (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, 380924323)
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn8" then
+						v12.Activated:Connect(function() --[[ Line: 2457 | Upvalues: MarketplaceService (copy), LocalPlayer (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, 380924499)
+						end)
+						continue
+					end
+					if v12.Name == "BuyBtn9" then
+						v12.Activated:Connect(function() --[[ Line: 2462 | Upvalues: MarketplaceService (copy), LocalPlayer (copy) ]]
+							Confirm2Sound:Play()
+							MarketplaceService:PromptProductPurchase(LocalPlayer, 380924635)
+						end)
+						continue
+					end
+					if v12.Name == "GiftBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2467 | Upvalues: Players_2 (copy), LocalPlayer (copy) ]]
+							for i, v in ipairs(gift_Frame:WaitForChild("Players_Frame"):GetChildren()) do
+								if v:IsA("Frame") then
+									v:Destroy()
+								end
+							end
+							Confirm2Sound:Play()
+							local Players_Frame = gift_Frame:WaitForChild("Players_Frame")
+							local v1 = UDim2.new
+							Players_Frame.CanvasSize = v1(0, 0, math.ceil((#Players_2:GetPlayers() - 1) / 5) * 2, 0)
+							for i, v in ipairs(Players_2:GetPlayers()) do
+								if v ~= LocalPlayer then
+									local v3 = gift_Frame.Players_Frame:WaitForChild("UIListLayout"):WaitForChild("Plr_Frame"):Clone()
+									local v4 = UDim2.new
+									v3.Size = v4(0.775, 0, 0.176 / math.ceil((#Players_2:GetPlayers() - 1) / 5), 0)
+									v3.Name = v.DisplayName
+									v3:WaitForChild("PlrProfileIcon_Img").Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. v.UserId .. "&width=350&height=260&format=png"
+									v3:WaitForChild("PlrProfileIcon_Img"):WaitForChild("PlrName_Txt").Text = v.Name
+									v3:WaitForChild("Trigger_ImgBtn").Activated:Connect(function() --[[ Line: 2482 | Upvalues: v3 (copy), v (copy) ]]
+										Confirm2Sound:Play()
+										for i, v2 in ipairs(gift_Frame.Players_Frame:GetChildren()) do
+											if v2:IsA("Frame") and v2:FindFirstChild("Trigger_ImgBtn") then
+												v2.Trigger_ImgBtn.BackgroundTransparency = 1
+											end
+										end
+										v3.Trigger_ImgBtn.BackgroundTransparency = 0.9
+										gift_Frame.Players_Frame:WaitForChild("SelectedUserId").Value = v.UserId
+									end)
+									v3.Parent = gift_Frame.Players_Frame
+								end
+							end
+							gift_Frame.Visible = true
+						end)
+					end
+				end
+				continue
+			end
+			if v11.Name == "SettingFrame" then
+				for k3, v12 in pairs(v11:GetChildren()) do
+					if string.find(v12.Name, "SettingTxt") and v12:FindFirstChild("ToggleBtn") then
+						v12:WaitForChild("ToggleBtn").Activated:Connect(function() --[[ Line: 2546 | Upvalues: v12 (copy), MarketplaceService (copy), LocalPlayer (copy), RemoteEvent (copy) ]]
+							Confirm2Sound:Play()
+							if v12.Name == "SettingTxt15" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12.Name == "SettingTxt28" and not _G.ClientPlrData.Inventory.Vip.HaveVip then
+								return
+							end
+							if v12.Name == "SettingTxt29" and not _G.ClientPlrData.Inventory.Vip.HaveVip then
+								return
+							end
+							if v12.Name == "SettingTxt30" and not _G.ClientPlrData.Inventory.GhostRiderPass then
+								return
+							end
+							if v12.Name == "SettingTxt31" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12.Name == "SettingTxt32" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12.Name == "SettingTxt33" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12.Name == "SettingTxt34" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12.Name == "SettingTxt35" and not _G.ClientPlrData.Inventory.LB_ConcealPass then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if (v12.Name ~= "SettingTxt36" or _G.ClientPlrData.Inventory.LB_ConcealPass) and (v12.Name == "SettingTxt37" and not _G.ClientPlrData.Inventory.LB_ConcealPass) then
+								MarketplaceService:PromptGamePassPurchase(LocalPlayer, 151816029)
+								return
+							end
+							if v12:WaitForChild("ToggleBtn").Text == "On" then
+								v12:WaitForChild("ToggleBtn").Text = "Off"
+								v12:WaitForChild("ToggleBtn").BackgroundColor3 = Color3.fromRGB(255, 110, 110)
+								v12:WaitForChild("ToggleBtn").BorderColor3 = Color3.fromRGB(206, 81, 43)
+								if v12.Name == "SettingTxt0" then
+									RemoteEvent:FireServer({ "Setting", "OnlyDmgVillain", false })
+									return
+								end
+								if v12.Name == "SettingTxt1" then
+									RemoteEvent:FireServer({ "Setting", "FSXpTxt", false })
+									return
+								end
+								if v12.Name == "SettingTxt2" then
+									RemoteEvent:FireServer({ "Setting", "BTXpTxt", false })
+									return
+								end
+								if v12.Name == "SettingTxt3" then
+									RemoteEvent:FireServer({ "Setting", "MSXpTxt", false })
+									return
+								end
+								if v12.Name == "SettingTxt4" then
+									RemoteEvent:FireServer({ "Setting", "JFXpTxt", false })
+									return
+								end
+								if v12.Name == "SettingTxt5" then
+									RemoteEvent:FireServer({ "Setting", "PPXpTxt", false })
+									return
+								end
+								if v12.Name == "SettingTxt6" then
+									RemoteEvent:FireServer({ "Setting", "BGMusic", false })
+									return
+								end
+								if v12.Name == "SettingTxt7" then
+									RemoteEvent:FireServer({ "Setting", "DmgToOpp", false })
+									return
+								end
+								if v12.Name == "SettingTxt8" then
+									RemoteEvent:FireServer({ "Setting", "DmgToSelf", false })
+									return
+								end
+								if v12.Name == "SettingTxt9" then
+									RemoteEvent:FireServer({ "Setting", "ShowNameTag", false })
+									return
+								end
+								if v12.Name == "SettingTxt10" then
+									RemoteEvent:FireServer({ "Setting", "ToggleWaterRun", false })
+									return
+								end
+								if v12.Name == "SettingTxt11" then
+									RemoteEvent:FireServer({ "Setting", "ToggleFlight", false })
+									return
+								end
+								if v12.Name == "SettingTxt15" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt24" then
+									RemoteEvent:FireServer({ "Setting", "SFX", false })
+									return
+								end
+								if v12.Name == "SettingTxt25" then
+									RemoteEvent:FireServer({ "Setting", "Show_TAR_BbGui", false })
+									return
+								end
+								if v12.Name == "SettingTxt26" then
+									RemoteEvent:FireServer({ "Setting", "GangFriendlyFire", false })
+									return
+								end
+								if v12.Name == "SettingTxt27" then
+									RemoteEvent:FireServer({ "Setting", "DisableGangInvitation", false })
+									return
+								end
+								if v12.Name == "SettingTxt28" and _G.ClientPlrData.Inventory.Vip.HaveVip then
+									RemoteEvent:FireServer({ "Setting", "ToggleVipCape", false })
+									return
+								end
+								if v12.Name == "SettingTxt29" and _G.ClientPlrData.Inventory.Vip.HaveVip then
+									RemoteEvent:FireServer({ "Setting", "ToggleVipTag", false })
+									return
+								end
+								if v12.Name == "SettingTxt30" and _G.ClientPlrData.Inventory.GhostRiderPass then
+									RemoteEvent:FireServer({ "Setting", "GhostRiderHead", false })
+									return
+								end
+								if v12.Name == "SettingTxt31" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_JF_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt32" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_PP_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt33" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_AT_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt34" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_SV_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt35" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_SH_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt36" then
+									RemoteEvent:FireServer({ "Setting", "Show_TPLbPos_ChatTag", false })
+									return
+								end
+								if v12.Name == "SettingTxt37" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "RepRank_Conceal", false })
+									return
+								end
+								if v12.Name == "SettingTxt38" then
+									RemoteEvent:FireServer({ "Setting", "XRay_Mode", false })
+								end
+							else
+								v12:WaitForChild("ToggleBtn").Text = "On"
+								v12:WaitForChild("ToggleBtn").BackgroundColor3 = Color3.fromRGB(213, 255, 0)
+								v12:WaitForChild("ToggleBtn").BorderColor3 = Color3.fromRGB(133, 190, 0)
+								if v12.Name == "SettingTxt0" then
+									RemoteEvent:FireServer({ "Setting", "OnlyDmgVillain", true })
+									return
+								end
+								if v12.Name == "SettingTxt1" then
+									RemoteEvent:FireServer({ "Setting", "FSXpTxt", true })
+									return
+								end
+								if v12.Name == "SettingTxt2" then
+									RemoteEvent:FireServer({ "Setting", "BTXpTxt", true })
+									return
+								end
+								if v12.Name == "SettingTxt3" then
+									RemoteEvent:FireServer({ "Setting", "MSXpTxt", true })
+									return
+								end
+								if v12.Name == "SettingTxt4" then
+									RemoteEvent:FireServer({ "Setting", "JFXpTxt", true })
+									return
+								end
+								if v12.Name == "SettingTxt5" then
+									RemoteEvent:FireServer({ "Setting", "PPXpTxt", true })
+									return
+								end
+								if v12.Name == "SettingTxt6" then
+									RemoteEvent:FireServer({ "Setting", "BGMusic", true })
+									return
+								end
+								if v12.Name == "SettingTxt7" then
+									RemoteEvent:FireServer({ "Setting", "DmgToOpp", true })
+									return
+								end
+								if v12.Name == "SettingTxt8" then
+									RemoteEvent:FireServer({ "Setting", "DmgToSelf", true })
+									return
+								end
+								if v12.Name == "SettingTxt9" then
+									RemoteEvent:FireServer({ "Setting", "ShowNameTag", true })
+									return
+								end
+								if v12.Name == "SettingTxt10" then
+									RemoteEvent:FireServer({ "Setting", "ToggleWaterRun", true })
+									return
+								end
+								if v12.Name == "SettingTxt11" then
+									RemoteEvent:FireServer({ "Setting", "ToggleFlight", true })
+									return
+								end
+								if v12.Name == "SettingTxt15" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt24" then
+									RemoteEvent:FireServer({ "Setting", "SFX", true })
+									return
+								end
+								if v12.Name == "SettingTxt25" then
+									RemoteEvent:FireServer({ "Setting", "Show_TAR_BbGui", true })
+									return
+								end
+								if v12.Name == "SettingTxt26" then
+									RemoteEvent:FireServer({ "Setting", "GangFriendlyFire", true })
+									return
+								end
+								if v12.Name == "SettingTxt27" then
+									RemoteEvent:FireServer({ "Setting", "DisableGangInvitation", true })
+									return
+								end
+								if v12.Name == "SettingTxt28" and _G.ClientPlrData.Inventory.Vip.HaveVip then
+									RemoteEvent:FireServer({ "Setting", "ToggleVipCape", true })
+									return
+								end
+								if v12.Name == "SettingTxt29" and _G.ClientPlrData.Inventory.Vip.HaveVip then
+									RemoteEvent:FireServer({ "Setting", "ToggleVipTag", true })
+									return
+								end
+								if v12.Name == "SettingTxt30" and _G.ClientPlrData.Inventory.GhostRiderPass then
+									RemoteEvent:FireServer({ "Setting", "GhostRiderHead", true })
+									return
+								end
+								if v12.Name == "SettingTxt31" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_JF_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt32" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_PP_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt33" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_AT_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt34" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_SV_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt35" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "LB_SH_Conceal", true })
+									return
+								end
+								if v12.Name == "SettingTxt36" then
+									RemoteEvent:FireServer({ "Setting", "Show_TPLbPos_ChatTag", true })
+									return
+								end
+								if v12.Name == "SettingTxt37" and _G.ClientPlrData.Inventory.LB_ConcealPass then
+									RemoteEvent:FireServer({ "Setting", "RepRank_Conceal", true })
+									return
+								end
+								if v12.Name ~= "SettingTxt38" then
+									return
+								end
+								RemoteEvent:FireServer({ "Setting", "XRay_Mode", true })
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt12" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2710 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 >= 11 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "SelectedMS", (math.floor(v1)) })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 == 0 then
+								v12:WaitForChild("TxtBox").Text = 0
+								RemoteEvent:FireServer({ "Setting", "SelectedMS", 0 })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 <= 10 then
+								v12:WaitForChild("TxtBox").Text = 11
+								RemoteEvent:FireServer({ "Setting", "SelectedMS", 11 })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.SelectedMS)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt13" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2732 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 >= 51 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "SelectedJP", (math.floor(v1)) })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 == 0 then
+								v12:WaitForChild("TxtBox").Text = 0
+								RemoteEvent:FireServer({ "Setting", "SelectedJP", 0 })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 <= 50 then
+								v12:WaitForChild("TxtBox").Text = 51
+								RemoteEvent:FireServer({ "Setting", "SelectedJP", 51 })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.SelectedJP)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt14" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2754 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 > 0 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "SelectedFS", (math.floor(v1)) })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 == 0 then
+								v12:WaitForChild("TxtBox").Text = 0
+								RemoteEvent:FireServer({ "Setting", "SelectedFS", 0 })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 < 1 then
+								v12:WaitForChild("TxtBox").Text = 1
+								RemoteEvent:FireServer({ "Setting", "SelectedFS", 1 })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.SelectedFS)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt16" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2776 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 >= 10 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "RelaxedWS", (math.floor(v1)) })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 < 10 then
+								v12:WaitForChild("TxtBox").Text = 10
+								RemoteEvent:FireServer({ "Setting", "RelaxedWS", 10 })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.RelaxedWS)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt17" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2794 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 >= 50 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "RelaxedJP", (math.floor(v1)) })
+								Confirm2Sound:Play()
+								return
+							end
+							if typeof(v1) == "number" and v1 < 50 then
+								v12:WaitForChild("TxtBox").Text = 50
+								RemoteEvent:FireServer({ "Setting", "RelaxedJP", 50 })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.RelaxedJP)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt18" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2812 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if typeof(v1) == "number" and v1 >= 0 then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "RelaxedFS", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.RelaxedFS)
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "SettingTxt19" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2824 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if _G.ClientPlrData.Inventory.Aura_Selector_Pass and (typeof(v1) == "number" and v1 >= 0) then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "Selected_FS_Aura", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.Selected_FS_Aura)
+								ErrorSound:Play()
+							end
+						end)
+						v12.TxtBox.Focused:Connect(function() --[[ Line: 2835 ]] end)
+						continue
+					end
+					if v12.Name == "SettingTxt20" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2841 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if _G.ClientPlrData.Inventory.Aura_Selector_Pass and (typeof(v1) == "number" and v1 >= 0) then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "Selected_BT_Aura", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.Selected_BT_Aura)
+								ErrorSound:Play()
+							end
+						end)
+						v12.TxtBox.Focused:Connect(function() --[[ Line: 2852 ]] end)
+						continue
+					end
+					if v12.Name == "SettingTxt21" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2858 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if _G.ClientPlrData.Inventory.Aura_Selector_Pass and (typeof(v1) == "number" and v1 >= 0) then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "Selected_MS_Aura", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.Selected_MS_Aura)
+								ErrorSound:Play()
+							end
+						end)
+						v12.TxtBox.Focused:Connect(function() --[[ Line: 2869 ]] end)
+						continue
+					end
+					if v12.Name == "SettingTxt22" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2875 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if _G.ClientPlrData.Inventory.Aura_Selector_Pass and (typeof(v1) == "number" and v1 >= 0) then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "Selected_JF_Aura", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.Selected_JF_Aura)
+								ErrorSound:Play()
+							end
+						end)
+						v12.TxtBox.Focused:Connect(function() --[[ Line: 2886 ]] end)
+						continue
+					end
+					if v12.Name == "SettingTxt23" then
+						v12:WaitForChild("TxtBox").FocusLost:Connect(function() --[[ Line: 2892 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							local Text = v12:WaitForChild("TxtBox").Text
+							local v1 = tonumber(Text)
+							if _G.ClientPlrData.Inventory.Aura_Selector_Pass and (typeof(v1) == "number" and v1 >= 0) then
+								v12:WaitForChild("TxtBox").Text = math.floor(v1)
+								RemoteEvent:FireServer({ "Setting", "Selected_PP_Aura", (math.floor(v1)) })
+								Confirm2Sound:Play()
+							else
+								local TxtBox = v12:WaitForChild("TxtBox")
+								TxtBox.Text = tostring(_G.ClientPlrData.Settings.Selected_PP_Aura)
+								ErrorSound:Play()
+							end
+						end)
+						v12.TxtBox.Focused:Connect(function() --[[ Line: 2903 ]] end)
+					end
+				end
+				continue
+			end
+			if v11.Name == "InfoFrame" then
+				for k3, v12 in pairs(v11:GetChildren()) do
+					if v12.Name == "UpgradeStatFrame" then
+						v12:WaitForChild("CancelTxtBtn").Activated:Connect(function() --[[ Line: 2913 | Upvalues: v12 (copy) ]]
+							v12.Visible = false
+						end)
+						v12:WaitForChild("ConfirmTxtBtn").Activated:Connect(function() --[[ Line: 2916 | Upvalues: v12 (copy), RemoteEvent (copy) ]]
+							if _G.ClientPlrData.Token >= v12:WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value then
+								Click2Sound:Play()
+								local t = {}
+								local v2 = v12:WaitForChild("Stat").Value
+								t[1] = "StatMultiplier"
+								t[2] = tostring(v2)
+								RemoteEvent:FireServer(t)
+								v12.Visible = false
+							else
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "VipImgBtn" then
+						v12.MouseEnter:Connect(function() --[[ Line: 2926 | Upvalues: v12 (copy) ]]
+							if v12.Visible ~= true then
+								return
+							end
+							v12:WaitForChild("TimeTxt").Visible = true
+						end)
+						v12.MouseLeave:Connect(function() --[[ Line: 2931 | Upvalues: v12 (copy) ]]
+							v12:WaitForChild("TimeTxt").Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "FSUpgradeImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2935 | Upvalues: v11 (copy), AddCommas (copy) ]]
+							Confirm2Sound:Play()
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Stat").Value = "FS"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Txt1").Text = "Upgrade Fist Strength Xp Multiplier to"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt").Text = AddCommas(_G.ClientPlrData.Next_FSMultiplier_Price)
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value = _G.ClientPlrData.Next_FSMultiplier_Price
+							local MultiplierTxt = v11:WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+							MultiplierTxt.Text = "x" .. tostring(_G.ClientPlrData.Next_FSMultiplier_Multi)
+							v11:WaitForChild("UpgradeStatFrame").Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "BTUpgradeImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2945 | Upvalues: v11 (copy), AddCommas (copy) ]]
+							Confirm2Sound:Play()
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Stat").Value = "BT"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Txt1").Text = "Upgrade Body Toughness Xp Multiplier to"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt").Text = AddCommas(_G.ClientPlrData.Next_BTMultiplier_Price)
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value = _G.ClientPlrData.Next_BTMultiplier_Price
+							local MultiplierTxt = v11:WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+							MultiplierTxt.Text = "x" .. tostring(_G.ClientPlrData.Next_BTMultiplier_Multi)
+							v11:WaitForChild("UpgradeStatFrame").Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "MSUpgradeImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2955 | Upvalues: v11 (copy), AddCommas (copy) ]]
+							Confirm2Sound:Play()
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Stat").Value = "MS"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Txt1").Text = "Upgrade Movement Speed Xp Multiplier to"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt").Text = AddCommas(_G.ClientPlrData.Next_MSMultiplier_Price)
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value = _G.ClientPlrData.Next_MSMultiplier_Price
+							local MultiplierTxt = v11:WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+							MultiplierTxt.Text = "x" .. tostring(_G.ClientPlrData.Next_MSMultiplier_Multi)
+							v11:WaitForChild("UpgradeStatFrame").Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "JFUpgradeImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2965 | Upvalues: v11 (copy), AddCommas (copy) ]]
+							Confirm2Sound:Play()
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Stat").Value = "JF"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Txt1").Text = "Upgrade Jump Force Xp Multiplier to"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt").Text = AddCommas(_G.ClientPlrData.Next_JFMultiplier_Price)
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value = _G.ClientPlrData.Next_JFMultiplier_Price
+							local MultiplierTxt = v11:WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+							MultiplierTxt.Text = "x" .. tostring(_G.ClientPlrData.Next_JFMultiplier_Multi)
+							v11:WaitForChild("UpgradeStatFrame").Visible = true
+						end)
+						continue
+					end
+					if v12.Name == "PPUpgradeImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 2975 | Upvalues: v11 (copy), AddCommas (copy) ]]
+							Confirm2Sound:Play()
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Stat").Value = "PP"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("Txt1").Text = "Upgrade Psychic Power Xp Multiplier to"
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt").Text = AddCommas(_G.ClientPlrData.Next_PPMultiplier_Price)
+							v11:WaitForChild("UpgradeStatFrame"):WaitForChild("GemImgBtn"):WaitForChild("AmountTxt"):WaitForChild("Price").Value = _G.ClientPlrData.Next_PPMultiplier_Price
+							local MultiplierTxt = v11:WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+							MultiplierTxt.Text = "x" .. tostring(_G.ClientPlrData.Next_PPMultiplier_Multi)
+							v11:WaitForChild("UpgradeStatFrame").Visible = true
+						end)
+					end
+				end
+			end
+		end
+		continue
+	end
+	if v.Name == "SpecialQuestFrame" then
+		v.MouseEnter:Connect(function() --[[ Line: 2989 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 2992 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		v:WaitForChild("LeftBtn").MouseButton1Click:Connect(function() --[[ Line: 2995 ]]
+			SpecialQuestFrame.Visible = false
+			DailyQuestFrame.Visible = false
+			WeeklyQuestFrame.Visible = false
+			MainQuestFrame.Visible = true
+		end)
+		v:WaitForChild("RightBtn").MouseButton1Click:Connect(function() --[[ Line: 3001 ]]
+			SpecialQuestFrame.Visible = false
+			MainQuestFrame.Visible = false
+			WeeklyQuestFrame.Visible = false
+			DailyQuestFrame.Visible = true
+		end)
+		continue
+	end
+	if v.Name == "MainQuestFrame" then
+		v.MouseEnter:Connect(function() --[[ Line: 3008 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 3011 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		v:WaitForChild("RightBtn").MouseButton1Click:Connect(function() --[[ Line: 3015 ]]
+			MainQuestFrame.Visible = false
+			DailyQuestFrame.Visible = false
+			WeeklyQuestFrame.Visible = false
+			SpecialQuestFrame.Visible = true
+		end)
+		continue
+	end
+	if v.Name == "DailyQuestFrame" then
+		v.MouseEnter:Connect(function() --[[ Line: 3022 ]]
+			local v1 = (os.time() - 1537333200) / 86400
+			local v2 = (math.floor(v1) + 1) * 86400 + 1537333200 - os.time()
+			local v4 = tostring((math.floor(v2 / 86400)))
+			local v6 = tostring((math.floor((v2 - 86400 * v4) / 3600)))
+			local v8 = tostring((math.floor((v2 - 86400 * v4 - 3600 * v6) / 60)))
+			ScreenGui:WaitForChild("QuestResetTxt").Text = "Reset in : " .. v6 .. "h " .. v8 .. "m"
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = true
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 3033 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11.Name == "RightBtn" then
+				v11.MouseButton1Click:Connect(function() --[[ Line: 3038 ]]
+					DailyQuestFrame.Visible = false
+					SpecialQuestFrame.Visible = false
+					MainQuestFrame.Visible = false
+					WeeklyQuestFrame.Visible = true
+				end)
+				continue
+			end
+			if v11.Name == "LeftBtn" then
+				v11.MouseButton1Click:Connect(function() --[[ Line: 3045 ]]
+					DailyQuestFrame.Visible = false
+					WeeklyQuestFrame.Visible = false
+					MainQuestFrame.Visible = false
+					SpecialQuestFrame.Visible = true
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame1" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3052 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.DailyQuest or (QuestData.DailyQuest.FS.Claim ~= false or not (QuestData.DailyQuest.FS.Progress >= 1000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "DLQ", "FS", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame2" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3066 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.DailyQuest or (QuestData.DailyQuest.BT.Claim ~= false or not (QuestData.DailyQuest.BT.Progress >= 1000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "DLQ", "BT", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame3" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3080 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.DailyQuest or (QuestData.DailyQuest.MS.Claim ~= false or not (QuestData.DailyQuest.MS.Progress >= 100))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "DLQ", "MS", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame4" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3094 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.DailyQuest or (QuestData.DailyQuest.JF.Claim ~= false or not (QuestData.DailyQuest.JF.Progress >= 100))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "DLQ", "JF", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame5" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3108 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.DailyQuest or (QuestData.DailyQuest.PP.Claim ~= false or not (QuestData.DailyQuest.PP.Progress >= 1000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "DLQ", "PP", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+			end
+		end
+		continue
+	end
+	if v.Name == "WeeklyQuestFrame" then
+		v.MouseEnter:Connect(function() --[[ Line: 3124 ]]
+			local v1 = (os.time() - 1537333200) / 604800
+			local v2 = (math.floor(v1) + 1) * 604800 + 1537333200 - os.time()
+			local v4 = tostring((math.floor(v2 / 86400)))
+			local v6 = tostring((math.floor((v2 - 86400 * v4) / 3600)))
+			local v8 = tostring((math.floor((v2 - 86400 * v4 - 3600 * v6) / 60)))
+			ScreenGui:WaitForChild("QuestResetTxt").Text = "Reset in : " .. v4 .. "d " .. v6 .. "h " .. v8 .. "m"
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = true
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 3135 ]]
+			ScreenGui:WaitForChild("QuestResetTxt").Visible = false
+		end)
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11.Name == "LeftBtn" then
+				v11.MouseButton1Click:Connect(function() --[[ Line: 3140 ]]
+					WeeklyQuestFrame.Visible = false
+					DailyQuestFrame.Visible = true
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame1" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3145 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.FS1.Claim ~= false or not (QuestData.WeeklyQuest.FS1.Progress >= 100000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "FS1", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame2" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3159 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.BT1.Claim ~= false or not (QuestData.WeeklyQuest.BT1.Progress >= 50000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "BT1", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame3" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3173 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.PP1.Claim ~= false or not (QuestData.WeeklyQuest.PP1.Progress >= 10000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "PP1", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame4" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3187 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.FS2.Claim ~= false or not (QuestData.WeeklyQuest.FS2.Progress >= 10000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "FS2", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame5" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3201 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.BT2.Claim ~= false or not (QuestData.WeeklyQuest.BT2.Progress >= 5000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "BT2", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame6" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3215 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.PP2.Claim ~= false or not (QuestData.WeeklyQuest.PP2.Progress >= 1000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "PP2", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame7" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3229 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.FS3.Claim ~= false or not (QuestData.WeeklyQuest.FS3.Progress >= 1000000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "FS3", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame8" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3243 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.BT3.Claim ~= false or not (QuestData.WeeklyQuest.BT3.Progress >= 500000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "BT3", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+				continue
+			end
+			if v11.Name == "MaxFrame9" then
+				v11:WaitForChild("ClaimBtn").MouseButton1Click:Connect(function() --[[ Line: 3257 | Upvalues: v11 (copy), RemoteEvent (copy) ]]
+					if v11:WaitForChild("ClaimBtn").Text == "Done" then
+						return
+					end
+					local QuestData = _G.ClientPlrData.QuestData
+					if not QuestData or (not QuestData.WeeklyQuest or (QuestData.WeeklyQuest.PP3.Claim ~= false or not (QuestData.WeeklyQuest.PP3.Progress >= 100000000))) then
+						return
+					end
+					CollectSound:Play()
+					RemoteEvent:FireServer({ "WLQ", "PP3", "Claim" })
+					v11:WaitForChild("ClaimBtn").Text = "Done"
+					v11:WaitForChild("ClaimBtn").BackgroundColor3 = Color3.fromRGB(255, 252, 144)
+				end)
+			end
+		end
+		continue
+	end
+	if v.Name == "RankEmblemFrame" then
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11:IsA("ImageButton") and v11.Name ~= "Next_ImgBtn" then
+				v11.Activated:Connect(function() --[[ Line: 3275 | Upvalues: v11 (copy), RemoteEvent (copy), v (copy) ]]
+					if v11.ImageTransparency == 0 then
+						local t = {}
+						local match = string.match
+						t[1] = "ChangeRankEmblem"
+						t[2] = tonumber(match(v11.Name, "%d+"))
+						RemoteEvent:FireServer(t)
+						Confirm2Sound:Play()
+						v.Visible = false
+					else
+						ErrorSound:Play()
+					end
+				end)
+				continue
+			end
+			if v11.Name == "Next_ImgBtn" then
+				v11.Activated:Connect(function() --[[ Line: 3286 | Upvalues: v (copy) ]]
+					v:WaitForChild("Page_2_Frame").Visible = true
+				end)
+				continue
+			end
+			if v11.Name == "Page_2_Frame" then
+				for i, v12 in ipairs(v11:GetChildren()) do
+					if v12:IsA("ImageButton") and (v12.Name ~= "Prev_ImgBtn" and v12.Name ~= "Next_ImgBtn") then
+						v12.Activated:Connect(function() --[[ Line: 3292 | Upvalues: v12 (copy), RemoteEvent (copy), v (copy) ]]
+							if v12.ImageTransparency == 0 then
+								local t = {}
+								local match = string.match
+								t[1] = "ChangeRankEmblem"
+								t[2] = tonumber(match(v12.Name, "%d+"))
+								RemoteEvent:FireServer(t)
+								Confirm2Sound:Play()
+								v.Visible = false
+							else
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "Prev_ImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 3303 | Upvalues: v11 (copy) ]]
+							v11.Visible = false
+						end)
+						continue
+					end
+					if v12.Name == "Next_ImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 3307 | Upvalues: v11 (copy), v (copy) ]]
+							v11.Visible = false
+							v:WaitForChild("Page_3_Frame").Visible = true
+						end)
+					end
+				end
+				continue
+			end
+			if v11.Name == "Page_3_Frame" then
+				for i, v12 in ipairs(v11:GetChildren()) do
+					if v12:IsA("ImageButton") and v12.Name ~= "Prev_ImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 3316 | Upvalues: v12 (copy), RemoteEvent (copy), v (copy) ]]
+							if v12.ImageTransparency == 0 then
+								local t = {}
+								local match = string.match
+								t[1] = "ChangeRankEmblem"
+								t[2] = tonumber(match(v12.Name, "%d+"))
+								RemoteEvent:FireServer(t)
+								Confirm2Sound:Play()
+								v.Visible = false
+							else
+								ErrorSound:Play()
+							end
+						end)
+						continue
+					end
+					if v12.Name == "Prev_ImgBtn" then
+						v12.Activated:Connect(function() --[[ Line: 3327 | Upvalues: v11 (copy), v (copy) ]]
+							v11.Visible = false
+							v:WaitForChild("Page_2_Frame").Visible = true
+						end)
+					end
+				end
+			end
+		end
+		continue
+	end
+	if v.Name == "RankImgBtn" then
+		local Frame = v:WaitForChild("Frame")
+		v.MouseEnter:Connect(function() --[[ Line: 3337 | Upvalues: ClientRemoteController_Module (copy), Frame (copy) ]]
+			if not (_G.ClientPlrData.Rank < 11) then
+				return
+			end
+			ClientRemoteController_Module.UpdateRankGui(RankImgBtn)
+			Frame.Visible = true
+		end)
+		v.MouseLeave:Connect(function() --[[ Line: 3343 | Upvalues: Frame (copy) ]]
+			Frame.Visible = false
+		end)
+		v.Activated:Connect(function() --[[ Line: 3344 ]]
+			OpenOrCloseGuiFunc(RankEmblemFrame)
+		end)
+		continue
+	end
+	if v.Name == "QuestTalkBtn" then
+		v.Activated:Connect(function() --[[ Line: 3348 | Upvalues: v (copy), RemoteEvent (copy) ]]
+			if v:WaitForChild("Npc").Value ~= "Sath" then
+				return
+			end
+			if _G.ClientPlrData.QuestData.MainQuest.No == 0 or _G.ClientPlrData.QuestData.MainQuest.Done then
+				TalkingOnQuest = true
+				v.Visible = false
+				gift_Frame.Visible = false
+				MenuFrame.Visible = false
+				RankEmblemFrame.Visible = false
+				skillHotkey_Frame.Visible = false
+				WeightFrame.Visible = false
+				Humanoid.WalkSpeed = 0
+				Humanoid.JumpPower = 0
+				Click2Sound:Play()
+				if Character and Character:FindFirstChild("QuestBeam") then
+					Character.QuestBeam:Destroy()
+					if Character:FindFirstChild("UpperTorso") and Character.UpperTorso:FindFirstChild("Attachment0") then
+						Character.UpperTorso.Attachment0:Destroy()
+					end
+					if workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("UpperTorso"):FindFirstChild("Attachment1") then
+						workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("UpperTorso"):FindFirstChild("Attachment1"):Destroy()
+					end
+				end
+				workspace:WaitForChild("Map"):WaitForChild("QuestNPC"):WaitForChild("Sathopian"):WaitForChild("QuestBbGui").Enabled = false
+				BeforeTalkToQuestNPCCameraCFrame = workspace.CurrentCamera.CFrame
+				workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+				workspace.CurrentCamera.CameraSubject = nil
+				workspace.CurrentCamera:Interpolate(CFrame.new(490.805, 251.32, 895.98), CFrame.new(497.495, 251.545, 897.271), 1)
+				wait(1)
+				local No = _G.ClientPlrData.QuestData.MainQuest.No
+				local Page = QuestMsgFrame:WaitForChild("Page")
+				local MsgTxt = QuestMsgFrame:WaitForChild("MsgTxt")
+				if No == 0 then
+					MsgTxt.Text = "Hello newcomer! Nice to meet you. My name is Sathopian."
+				elseif No == 1 then
+					MsgTxt.Text = "Good job. Now in order to become stronger..."
+				elseif No == 2 then
+					MsgTxt.Text = "Now we will talk about the most important thing, the mind."
+				elseif No == 3 then
+					MsgTxt.Text = "Congratulation! Now you can become invisible anytime you want just by pressing \"T\"."
+				elseif No == 4 then
+					MsgTxt.Text = "Good. From now on you can press \"R\" to execute the Energy Sphere Punch."
+				elseif No == 5 then
+					MsgTxt.Text = "Great! And don\'t worry, it is a passive skill! So you don\'t have to execute it everytime."
+				elseif No == 6 then
+					MsgTxt.Text = "Hello, now I\'m sure you can run on water!"
+				elseif No == 7 then
+					MsgTxt.Text = "Now it\'s a lot better than before right?"
+				elseif No == 8 then
+					MsgTxt.Text = "Good! Now you can teleport by pressing \"V\" and point to where you wanna go."
+				elseif No == 9 then
+					MsgTxt.Text = "Now you can jump when you are falling down to start flying and jump again to stop flying."
+				elseif No == 10 then
+					MsgTxt.Text = "Well done. Now you can press \"F\" to execute the Bullet Punch."
+				elseif No == 11 then
+					MsgTxt.Text = "Cheers! Now you can point to your opponent and press \"B\" to launch the Soul Attack."
+				elseif No == 12 then
+					MsgTxt.Text = "Congratulation! Now you can press \"X\" to Conceal or Reveal your powerful aura."
+				else
+					if No ~= 13 then
+						Page.Value = 2
+						QuestMsgFrame.Visible = true
+						RemoteEvent:FireServer({ "QuestTalkStart" })
+						return
+					end
+					MsgTxt.Text = "OMG!! I never think you will get this far. It\'s like 100 millions Psychic Power!!"
+				end
+				Page.Value = 2
+				QuestMsgFrame.Visible = true
+				RemoteEvent:FireServer({ "QuestTalkStart" })
+			else
+				QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, -0.2, 0), "Out", "Back", 0.5, true)
+				QuestTalkBtn.Visible = false
+				if not _G.IsMobile then
+					return
+				end
+				skillHotkey_Frame.Visible = true
+			end
+		end)
+		continue
+	end
+	if v.Name == "QuestMsgFrame" then
+		for k2, v11 in pairs(v:GetChildren()) do
+			if v11.Name == "Btn" then
+				v11.Activated:Connect(function() --[[ Line: 3423 ]]
+					QuestTalkFunc()
+				end)
+				v11.MouseButton2Click:Connect(function() --[[ Line: 3426 ]]
+					QuestTalkFunc()
+				end)
+			end
+		end
+	end
+end
+coroutine.resume(coroutine.create(function() --[[ Line: 3438 ]]
+	local FSMultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("FSMultiplierTxt")
+	local v1 = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, -1, true, 0)
+	local t = {
+		TextColor3 = Color3.fromRGB(255, 255, 0),
+		TextStrokeColor3 = Color3.fromRGB(255, 0, 255)
+	}
+	TweenService:Create(FSMultiplierTxt, v1, t):Play()
+	wait(0.25)
+	local BTMultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("BTMultiplierTxt")
+	TweenService:Create(BTMultiplierTxt, v1, t):Play()
+	wait(0.25)
+	local MSMultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("MSMultiplierTxt")
+	TweenService:Create(MSMultiplierTxt, v1, t):Play()
+	wait(0.25)
+	local JFMultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("JFMultiplierTxt")
+	TweenService:Create(JFMultiplierTxt, v1, t):Play()
+	wait(0.25)
+	local PPMultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("PPMultiplierTxt")
+	TweenService:Create(PPMultiplierTxt, v1, t):Play()
+	wait(0.25)
+	local MultiplierTxt = MenuFrame:WaitForChild("InfoFrame"):WaitForChild("UpgradeStatFrame"):WaitForChild("MultiplierTxt")
+	TweenService:Create(MultiplierTxt, v1, t):Play()
+end))
+local v15 = tick()
+local v16 = Vector3.new(0, 0, 0)
+local function f17() --[[ Line: 3475 | Upvalues: v5 (ref), ClientRemoteController_Module (copy), v15 (ref), v16 (ref), RemoteEvent (copy) ]]
+	while wait(0.1) do
+		pcall(function() --[[ Line: 3477 | Upvalues: v5 (ref), ClientRemoteController_Module (ref), v15 (ref), v16 (ref), RemoteEvent (ref) ]]
+			if v5 < 0.1 or Humanoid.WalkSpeed <= 9 then
+				v5 = 0
+				if not (v5 > 0.1) or (not (Humanoid.WalkSpeed <= 9) or (not HumanoidRootPart or HumanoidRootPart.Anchored ~= false)) then
+					return
+				end
+				WarnTxt.Text = "too heavy to train Movement Speed!"
+				ClientRemoteController_Module.PopUpAndAutoHideGui(WarnTxt, 1)
+			else
+				if not (v5 > 0) or (_G.Flying or (not Humanoid or (not Character or (Humanoid:GetState() == Enum.HumanoidStateType.Swimming or (QuestMsgFrame.Visible ~= false or (not (_G.ClientPlrData.QuestData.MainQuest.No >= 2) or (not (tick() - v15 >= 2) or v16 == Character.PrimaryPart.Position))))))) then
+					return
+				end
+				v15 = tick()
+				v16 = Character.PrimaryPart.Position
+				RemoteEvent:FireServer({ "Add_MS_Request" })
+			end
+		end)
+	end
+end
+coroutine.resume(coroutine.create(f17))
+coroutine.resume(coroutine.create(function() --[[ Line: 3502 | Upvalues: LocalPlayer (copy), Players_2 (copy) ]]
+	while wait(3) do
+		pcall(function() --[[ Line: 3504 | Upvalues: LocalPlayer (ref), Players_2 (ref) ]]
+			if not (_G.ClientPlrData and (_G.ClientPlrData.Settings and (_G.ClientPlrData.Settings.XRay_Mode and (LocalPlayer.Character and (LocalPlayer.Character:FindFirstChild("SPTS_CP") and LocalPlayer.Character:FindFirstChild("SPTS_MK")))))) then
+				return
+			end
+			local v1 = LocalPlayer.Character.SPTS_CP.Value - math.sqrt(LocalPlayer.Character.SPTS_MK.Value) / 24
+			for i, v in ipairs(Players_2:GetPlayers()) do
+				if v ~= LocalPlayer and (v.Parent and (v.Character and (v.Character:FindFirstChild("SPTS_CP") and v.Character:FindFirstChild("SPTS_MK")))) then
+					local v2 = v.Character.SPTS_CP.Value - math.sqrt(v.Character.SPTS_MK.Value) / 24
+					local v3 = nil
+					if v1 <= v2 + 1 then
+						if v.Character:FindFirstChild("Highlight") then
+							v.Character.Highlight:Destroy()
+						end
+						if v.Character:FindFirstChild("Highlight") then
+							v.Character.Highlight:Destroy()
+						end
+					elseif v2 + 9 < v1 then
+						v3 = 0
+					elseif v2 + 8 < v1 then
+						v3 = 0.2
+					elseif v2 + 7 < v1 then
+						v3 = 0.4
+					elseif v2 + 6 < v1 then
+						v3 = 0.6
+					elseif v2 + 5 < v1 then
+						v3 = 0.8
+					elseif v2 + 4 < v1 then
+						v3 = 0.9
+					elseif v2 + 3 < v1 then
+						v3 = 0.95
+					elseif v2 + 2 < v1 then
+						v3 = 0.98
+					elseif v2 + 1 < v1 then
+						v3 = 0.99
+					end
+					if v3 then
+						if v.Character:FindFirstChild("Highlight") then
+							v.Character.Highlight.FillTransparency = v3
+							v.Character.Highlight.OutlineTransparency = v3
+							v.Character.Highlight.Enabled = true
+							continue
+						end
+						local Highlight = Instance.new("Highlight")
+						Highlight.Name = "Highlight"
+						Highlight.Adornee = v.Character
+						Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+						Highlight.FillColor = Color3.fromRGB(255, 0, 0)
+						Highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+						Highlight.FillTransparency = v3
+						Highlight.OutlineTransparency = v3
+						Highlight.Enabled = true
+						Highlight.Parent = v.Character
+					end
+				end
+			end
+		end)
+	end
+end))
+coroutine.resume(coroutine.create(function() --[[ Line: 3567 | Upvalues: Map_2 (copy) ]]
+	if not Map_2:FindFirstChild("Training_Decorations") then
+		return
+	end
+	local BodyToughness = Map_2:WaitForChild("Training_Decorations"):WaitForChild("BodyToughness")
+	while wait(0.075) do
+		local v1, clientlava_effectloop_function = pcall(function() --[[ Line: 3571 | Upvalues: BodyToughness (copy), Map_2 (ref) ]]
+			for i = 1, 25 do
+				if BodyToughness:FindFirstChild("Volcano") then
+					if BodyToughness:FindFirstChild("Volcano") then
+						for k, v in pairs(BodyToughness.Volcano.Lava:GetChildren()) do
+							if v.Name == "LavaPart" then
+								for k2, v2 in pairs(v:GetChildren()) do
+									if v2:IsA("Texture") then
+										v2.Texture = string.format("rbxasset://textures/water/normal_%02d.dds", i)
+									end
+								end
+							end
+						end
+						for k, v in pairs(Map_2:WaitForChild("TrainingArea"):WaitForChild("LavaPart2"):GetChildren()) do
+							if v:IsA("Texture") then
+								v.Texture = string.format("rbxasset://textures/water/normal_%02d.dds", i)
+							end
+						end
+					end
+					wait(0.075)
+				end
+			end
+		end)
+		if not v1 then
+			print("(Client) Lava_Effect LOOP_FUNCTION :", clientlava_effectloop_function)
+		end
+	end
+end))
+local v18 = 0
+local v19 = 0
+local function f20() --[[ Line: 3604 | Upvalues: v18 (ref), v19 (ref), RemoteEvent (copy), ClientRemoteController_Module (copy), IsAlive (copy), LocalPlayer (copy), ReplicatedStorage (copy) ]]
+	while wait(0.2) do
+		local v1, clientmainloop_function = pcall(function() --[[ Line: 3606 | Upvalues: v18 (ref), v19 (ref), RemoteEvent (ref), ClientRemoteController_Module (ref), IsAlive (ref), LocalPlayer (ref), ReplicatedStorage (ref) ]]
+			if v18 >= 5 then
+				v19 = v19 + 1
+				RemoteEvent:FireServer({ "Update_Flying_Status", _G.Flying })
+				if v19 >= 1 then
+					v19 = 0
+				end
+				local Sec = IntroGui:WaitForChild("ServerAgeTxt"):WaitForChild("Sec")
+				Sec.Value = Sec.Value + 1
+				IntroGui.ServerAgeTxt.Text = "Server Age " .. ClientRemoteController_Module.ConvertToDayHourMinFormat(IntroGui.ServerAgeTxt.Sec.Value)
+				v18 = 0
+			end
+			v18 = v18 + 1
+			if not IsAlive(LocalPlayer) then
+				return
+			end
+			if (HumanoidRootPart.CFrame.p - ReplicatedStorage:WaitForChild("SathPart").CFrame.p).magnitude < 25 and (QuestTalkBtn.Visible == false and (QuestMsgFrame.Visible == false and Humanoid.WalkSpeed ~= 0)) then
+				ClientRemoteController_Module.Storage.TouchingQuestPart = true
+				if _G.ClientPlrData.QuestData.MainQuest.No == 0 or _G.ClientPlrData.QuestData.MainQuest.Done then
+					QuestTalkBtn:WaitForChild("Npc").Value = "Sath"
+					QuestTalkBtn.Visible = true
+					QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, 0.05, 0), "Out", "Back", 0.5, true)
+				else
+					QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, -0.2, 0), "Out", "Back", 0.5, true)
+					QuestTalkBtn.Visible = false
+					if _G.IsMobile then
+						skillHotkey_Frame.Visible = true
+					end
+				end
+			elseif ClientRemoteController_Module.Storage.TouchingQuestPart and (HumanoidRootPart.CFrame.p - ReplicatedStorage:WaitForChild("SathPart").CFrame.p).magnitude >= 25 then
+				ClientRemoteController_Module.Storage.TouchingQuestPart = false
+				QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, -0.2, 0), "Out", "Back", 0.5, true)
+				QuestMsgFrame.Visible = false
+				delay(0.5, function() --[[ Line: 3644 ]]
+					QuestTalkBtn.Visible = false
+					if not _G.IsMobile then
+						return
+					end
+					skillHotkey_Frame.Visible = true
+				end)
+				if _G.IsMobile then
+					skillHotkey_Frame.Visible = true
+				end
+			elseif not ClientRemoteController_Module.Storage.TouchingQuestPart and (UserInputService.MouseEnabled and (UserInputService.TouchEnabled and not skillHotkey_Frame.Visible)) then
+				skillHotkey_Frame.Visible = true
+			end
+			if _G.ClientPlrData.QuestData.MainQuest.Done or QuestTalkBtn.Visible ~= true then
+				return
+			end
+			QuestTalkBtn:TweenPosition(UDim2.new(0.387, 0, -0.2, 0), "Out", "Back", 0.5, true)
+			QuestTalkBtn.Visible = false
+		end)
+		if v1 then
+			continue
+		end
+		print("(Client) Main LOOP_FUNCTION :", clientmainloop_function)
+	end
+end
+coroutine.resume(coroutine.create(f20))
+local v21 = tick()
+local TextChatService = game:GetService("TextChatService")
+function TextChatService.OnIncomingMessage(p1) --[[ Line: 3676 | Upvalues: ClientRemoteController_Module (copy), ReplicatedStorage (copy), v21 (ref), LocalPlayer (copy), RemoteEvent (copy) ]]
+	local TextSource = p1.TextSource
+	if not TextSource then
+		return nil
+	end
+	local v1 = Players:GetPlayerByUserId(TextSource.UserId)
+	if not v1 then
+		return nil
+	end
+	local v2 = Color3.fromRGB(250, 250, 250)
+	Color3.fromRGB(250, 250, 250)
+	local v3 = v1:GetAttribute("Reputation")
+	local v4
+	if v3 then
+		local v5 = v1:GetAttribute("WorldRank")
+		local v6 = nil
+		if v5 and (v5 > 0 and v1:GetAttribute("Show_TPLbPos_ChatTag")) then
+			if v5 <= 10 then
+				local v7 = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(Color3.fromRGB(255, 0, 0):ToHex(), "[" .. tostring(v5) .. ClientRemoteController_Module.CalculateOrdinalsSuffix(v5) .. "]")
+				Color3.fromRGB(255, 0, 0)
+				v6 = v7
+			elseif v5 <= 50 then
+				local v8 = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(Color3.fromRGB(0, 255, 255):ToHex(), "[" .. tostring(v5) .. ClientRemoteController_Module.CalculateOrdinalsSuffix(v5) .. "]")
+				Color3.fromRGB(0, 255, 255)
+				v6 = v8
+			elseif v5 <= 100 then
+				local v9 = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(Color3.fromRGB(0, 255, 0):ToHex(), "[" .. tostring(v5) .. ClientRemoteController_Module.CalculateOrdinalsSuffix(v5) .. "]")
+				Color3.fromRGB(0, 255, 0)
+				v6 = v9
+			end
+		end
+		local t = {
+			TagText = "Innocent",
+			TagColor = Color3.fromRGB(250, 250, 250)
+		}
+		local Hero = ReplicatedStorage:WaitForChild("Rep_ChatNameColors"):WaitForChild("Hero")
+		local Villain = ReplicatedStorage:WaitForChild("Rep_ChatNameColors"):WaitForChild("Villain")
+		if v3 == 0 then
+			v2 = Color3.fromRGB(250, 250, 250)
+		elseif v3 > 0 and v3 < 10 then
+			t = {
+				TagText = "Protector",
+				TagColor = Hero:WaitForChild("1"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 10 and v3 < 40 then
+			t = {
+				TagText = "Guardian",
+				TagColor = Hero:WaitForChild("2"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 40 and v3 < 100 then
+			t = {
+				TagText = "Superhero",
+				TagColor = Hero:WaitForChild("3"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 100 and v3 < 200 then
+			t = {
+				TagText = "Punisher",
+				TagColor = Hero:WaitForChild("4"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 200 and v3 < 300 then
+			t = {
+				TagText = "Lightbringer",
+				TagColor = Hero:WaitForChild("5"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 300 and v3 < 400 then
+			t = {
+				TagText = "Saint",
+				TagColor = Hero:WaitForChild("6"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 400 and v3 < 500 then
+			t = {
+				TagText = "Paragon",
+				TagColor = Hero:WaitForChild("7"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 500 and v3 < 600 then
+			t = {
+				TagText = "Lionheart",
+				TagColor = Hero:WaitForChild("8"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 600 and v3 < 800 then
+			t = {
+				TagText = "Chosen One",
+				TagColor = Hero:WaitForChild("9"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 800 and v3 < 1000 then
+			t = {
+				TagText = "Liberator",
+				TagColor = Hero:WaitForChild("10"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 1000 and v3 < 1500 then
+			t = {
+				TagText = "One With Glory",
+				TagColor = Hero:WaitForChild("11"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 1500 and v3 < 2000 then
+			t = {
+				TagText = "Wonderbringer",
+				TagColor = Hero:WaitForChild("12"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 2000 and v3 < 2500 then
+			t = {
+				TagText = "Benefactor",
+				TagColor = Hero:WaitForChild("13"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 2500 and v3 < 3500 then
+			t = {
+				TagText = "Executioner",
+				TagColor = Hero:WaitForChild("14"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 3500 and v3 < 5000 then
+			t = {
+				TagText = "Morningstar",
+				TagColor = Hero:WaitForChild("15"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 5000 and v3 < 7500 then
+			t = {
+				TagText = "Flames of Fire",
+				TagColor = Hero:WaitForChild("16"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 7500 and v3 < 10000 then
+			t = {
+				TagText = "Blinding Lights",
+				TagColor = Hero:WaitForChild("17"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 10000 and v3 < 20000 then
+			t = {
+				TagText = "Peace Dominion",
+				TagColor = Hero:WaitForChild("18"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 20000 and v3 < 30000 then
+			t = {
+				TagText = "Constellations",
+				TagColor = Hero:WaitForChild("19"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 30000 and v3 < 50000 then
+			t = {
+				TagText = "Supreme Unknown",
+				TagColor = Hero:WaitForChild("20"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 50000 and v3 < 100000 then
+			t = {
+				TagText = "Eternal Life",
+				TagColor = Hero:WaitForChild("21"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 >= 100000 then
+			t = {
+				TagText = "Savior of Worlds",
+				TagColor = Hero:WaitForChild("22"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 < 0 and v3 > -10 then
+			t = {
+				TagText = "Lawbreaker",
+				TagColor = Villain:WaitForChild("1"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -10 and v3 > -40 then
+			t = {
+				TagText = "Criminal",
+				TagColor = Villain:WaitForChild("2"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -40 and v3 > -100 then
+			t = {
+				TagText = "Supervillain",
+				TagColor = Villain:WaitForChild("3"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -100 and v3 > -200 then
+			t = {
+				TagText = "Devilish",
+				TagColor = Villain:WaitForChild("4"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -200 and v3 > -300 then
+			t = {
+				TagText = "Satanic",
+				TagColor = Villain:WaitForChild("5"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -300 and v3 > -400 then
+			t = {
+				TagText = "Hellish",
+				TagColor = Villain:WaitForChild("6"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -400 and v3 > -500 then
+			t = {
+				TagText = "Death",
+				TagColor = Villain:WaitForChild("7"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -500 and v3 > -600 then
+			t = {
+				TagText = "Archdemon",
+				TagColor = Villain:WaitForChild("8"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -600 and v3 > -800 then
+			t = {
+				TagText = "The Devourer",
+				TagColor = Villain:WaitForChild("9"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -800 and v3 > -1000 then
+			t = {
+				TagText = "Wicked Revengers",
+				TagColor = Villain:WaitForChild("10"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -1000 and v3 > -1500 then
+			t = {
+				TagText = "Soulcounter",
+				TagColor = Villain:WaitForChild("11"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -1500 and v3 > -2000 then
+			t = {
+				TagText = "The Dark Sun",
+				TagColor = Villain:WaitForChild("12"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -2000 and v3 > -2500 then
+			t = {
+				TagText = "Infernal Judge",
+				TagColor = Villain:WaitForChild("13"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -2500 and v3 > -3500 then
+			t = {
+				TagText = "The Last Nemesis",
+				TagColor = Villain:WaitForChild("14"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -3500 and v3 > -5000 then
+			t = {
+				TagText = "Minister of Chaos",
+				TagColor = Villain:WaitForChild("15"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -5000 and v3 > -7500 then
+			t = {
+				TagText = "Great Disaster",
+				TagColor = Villain:WaitForChild("16"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -7500 and v3 > -10000 then
+			t = {
+				TagText = "Ruler Of All Evil",
+				TagColor = Villain:WaitForChild("17"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -10000 and v3 > -20000 then
+			t = {
+				TagText = "Inferno Furies",
+				TagColor = Villain:WaitForChild("18"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -20000 and v3 > -30000 then
+			t = {
+				TagText = "Warmaster",
+				TagColor = Villain:WaitForChild("19"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -30000 and v3 > -50000 then
+			t = {
+				TagText = "Lord of Calamity",
+				TagColor = Villain:WaitForChild("20"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -50000 and v3 > -100000 then
+			t = {
+				TagText = "False God",
+				TagColor = Villain:WaitForChild("21"):WaitForChild("NameTxt").TextColor3
+			}
+		elseif v3 <= -100000 then
+			t = {
+				TagText = "Harbringer of Doom",
+				TagColor = Villain:WaitForChild("22"):WaitForChild("NameTxt").TextColor3
+			}
+		end
+		if t and t.TagColor then
+			v2 = t.TagColor
+		end
+		if v1:GetAttribute("Rank_Conceal") then
+			local t2 = {
+				TagText = "Innocen?",
+				TagColor = Color3.fromRGB(225, 225, 225)
+			}
+			t, v2 = t2, Color3.fromRGB(225, 225, 225)
+		end
+		local v12 = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(t.TagColor:ToHex(), "[" .. t.TagText .. "]")
+		v4 = if v6 then v6 .. " " .. v12 else v12
+		if v1:GetAttribute("IsModerator") then
+			v4 = ("<font face=\"Cartoon\" color=\'#%*\'>[MOD]</font> "):format((Color3.fromRGB(255, 255, 0):ToHex())) .. v4
+			Color3.fromRGB(255, 0, 255)
+			v2 = Color3.fromRGB(255, 0, 0)
+		end
+	else
+		v4 = ""
+	end
+	local TextChatMessageProperties = Instance.new("TextChatMessageProperties")
+	TextChatMessageProperties.PrefixText = p1.PrefixText
+	TextChatMessageProperties.Text = p1.Text
+	TextChatMessageProperties.PrefixText = v1.Name
+	TextChatMessageProperties.PrefixText = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(v2:ToHex(), "" .. TextChatMessageProperties.PrefixText .. ":")
+	TextChatMessageProperties.PrefixText = ("%* %*"):format(v4, TextChatMessageProperties.PrefixText)
+	if v1:GetAttribute("VIPTag") then
+		TextChatMessageProperties.PrefixText = ("<font face=\"Cartoon\" color=\'#%*\'>\240\159\145\145VIP </font>"):format((Color3.fromRGB(250, 250, 250):ToHex())) .. TextChatMessageProperties.PrefixText
+		TextChatMessageProperties.Text = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(Color3.fromRGB(250, 220, 0):ToHex(), TextChatMessageProperties.Text)
+	else
+		TextChatMessageProperties.Text = ("<font face=\"Cartoon\" color=\'#%*\'>%*</font>"):format(Color3.fromRGB(250, 250, 250):ToHex(), TextChatMessageProperties.Text)
+	end
+	if tick() - v21 >= 0.25 then
+		v21 = tick()
+		if v1 == LocalPlayer and v1:GetAttribute("ServerOwner") then
+			if string.match(p1.Text:lower(), ";pvp on") or string.match(p1.Text:lower(), ";pvpon") then
+				RemoteEvent:FireServer({ "TogglePVP_Request", true })
+			end
+			if string.match(p1.Text:lower(), ";pvp off") or string.match(p1.Text:lower(), ";pvpoff") then
+				RemoteEvent:FireServer({ "TogglePVP_Request", false })
+			end
+		end
+	end
+	return TextChatMessageProperties
+end
+function TextChatService.OnBubbleAdded(p1) --[[ Line: 3846 ]]
+	local BubbleChatMessageProperties = Instance.new("BubbleChatMessageProperties")
+	local TextSource = p1.TextSource
+	BubbleChatMessageProperties.Text = p1.Text
+	BubbleChatMessageProperties.FontFace = Font.fromEnum(Enum.Font.Cartoon)
+	BubbleChatMessageProperties.TextColor3 = Color3.fromRGB(57, 59, 61)
+	BubbleChatMessageProperties.TextSize = 19
+	return BubbleChatMessageProperties
+end
+if not UserInputService.MouseEnabled and UserInputService.TouchEnabled then
+	_G.IsMobile = true
+end
+print("Initial Client SetUp : Completed")
+coroutine.resume(coroutine.create(function() --[[ Line: 4128 | Upvalues: v10 (ref), SetUp_TouchDevice_Fly (copy) ]]
+	if not (v10 and _G.IsMobile) then
+		return
+	end
+	while v10 do
+		wait(0.2)
+		SetUp_TouchDevice_Fly()
+	end
+end))
+local v22 = nil
+local function f23() --[[ Line: 4138 | Upvalues: v22 (ref), RemoteEvent (copy) ]]
+	if v22 then
+		return
+	end
+	repeat
+		wait(1)
+		if pcall(function() --[[ Line: 4142 | Upvalues: RemoteEvent (ref) ]]
+			local v1 = Instance.new("BindableEvent")
+			v1.Event:connect(function() --[[ Line: 4144 | Upvalues: RemoteEvent (ref) ]]
+				RemoteEvent:FireServer({ "ResetCharacter" })
+			end)
+			game:GetService("StarterGui"):SetCore("ResetButtonCallback", v1)
+		end) then
+			v22 = true
+			return
+		end
+		wait(10)
+	until v22
+end
+coroutine.resume(coroutine.create(f23))
+if _G.IsMobile then
+	for i = 1, 24 do
+		if ScreenGui.AbsoluteSize.Y < 500 then
+			MainQuestFrame.ScrollBarThickness = 4
+			SpecialQuestFrame.ScrollBarThickness = 4
+			DailyQuestFrame.ScrollBarThickness = 4
+			WeeklyQuestFrame.ScrollBarThickness = 4
+			skillHotkey_Frame:WaitForChild("UIListLayout").Padding = UDim.new(0.07, 0)
+			skillHotkey_Frame.Position = UDim2.new(0.5, 0, 0.75, 0)
+			skillHotkey_Frame.Size = UDim2.new(0.6, 0, 0.075, 0)
+			skillHotkey_Frame.Visible = true
+			btn_BorderSizePixel = 2
+			MenuFrame.Position = UDim2.new(0.5, 0, 0.15, 0)
+			MenuFrame.Size = UDim2.new(0.4, 0, 0.625, 0)
+			for i2, v in ipairs(ReplicatedStorage:WaitForChild("GuiStorage"):GetDescendants()) do
+				if v:IsA("UIStroke") then
+					v.Thickness = 1.5
+				end
+			end
+		else
+			MainQuestFrame.ScrollBarThickness = 6
+			SpecialQuestFrame.ScrollBarThickness = 6
+			DailyQuestFrame.ScrollBarThickness = 6
+			WeeklyQuestFrame.ScrollBarThickness = 6
+			skillHotkey_Frame:WaitForChild("UIListLayout").Padding = UDim.new(0.085, 0)
+			skillHotkey_Frame.Position = UDim2.new(0.5, 0, 0.85, 0)
+			skillHotkey_Frame.Size = UDim2.new(0.5, 0, 0.05, 0)
+			skillHotkey_Frame.Visible = true
+			btn_BorderSizePixel = 4
+			MenuFrame.Position = UDim2.new(0.5, 0, 0.25, 0)
+			MenuFrame.Size = UDim2.new(0.45, 0, 0.5, 0)
+			for i2, v in ipairs(ReplicatedStorage:WaitForChild("GuiStorage"):GetDescendants()) do
+				if v:IsA("UIStroke") then
+					v.Thickness = 2.5
+				end
+			end
+		end
+		for i2, v in ipairs(skillHotkey_Frame:GetChildren()) do
+			if v:IsA("TextButton") then
+				v.BorderSizePixel = btn_BorderSizePixel
+			end
+		end
+		wait(2.5)
+	end
+	print("Touch Device Gui SetUp")
+else
+	skillHotkey_Frame.Visible = false
+end
+if UserInputService.MouseEnabled or not UserInputService.TouchEnabled then
+	print("Full Client SetUp : Completed")
+	return
+end
+_G.IsMobile = true
+print("Full Client SetUp : Completed")
