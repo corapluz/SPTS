@@ -74,10 +74,9 @@ local function tryEnterFlyMode()
     local hum, root = getHumAndRoot()
     if not hum or not root or hum.Health <= 0 then return false end
 
-    -- Step 1: jump to get airborne (CanFly becomes true in Freefall).
+    -- Step 1: get airborne if on ground
     if hum.FloorMaterial ~= Enum.Material.Air then
         doJump()
-        -- Wait for Freefall state.
         local t0 = tick()
         while tick() - t0 < 1.5 do
             if hum:GetState() == Enum.HumanoidStateType.Freefall then break end
@@ -85,20 +84,22 @@ local function tryEnterFlyMode()
         end
     end
 
-    -- Step 2: in Freefall, CanFly is true — jump again to activate fly.
+    -- Step 2: in Freefall — set CanFly=true (game global) then jump to activate fly
     if hum:GetState() == Enum.HumanoidStateType.Freefall then
-        task.wait(0.05) -- let CanFly be set
+        -- CanFly is a game global set in Freefall state — we can also set it directly
+        pcall(function() CanFly = true end)
+        task.wait(0.05)
         doJump()
         local t0 = tick()
-        while tick() - t0 < 1.2 do
+        while tick() - t0 < 1.5 do
             if _G.isFlying() then return true end
             task.wait(0.05)
         end
     end
 
-    -- If still not flying, teleport to open air and retry once.
-    root.CFrame = CFrame.new(Vector3.new(root.Position.X, root.Position.Y + 50, root.Position.Z))
-    task.wait(0.3)
+    -- Still not flying — TP 50 units up, wait for Freefall, try once more
+    root.CFrame = CFrame.new(root.Position + Vector3.new(0, 50, 0))
+    task.wait(0.1)
     hum, root = getHumAndRoot()
     if hum and root then
         local t0 = tick()
@@ -107,10 +108,11 @@ local function tryEnterFlyMode()
             task.wait(0.05)
         end
         if hum:GetState() == Enum.HumanoidStateType.Freefall then
+            pcall(function() CanFly = true end)
             task.wait(0.05)
             doJump()
             local t0b = tick()
-            while tick() - t0b < 1.2 do
+            while tick() - t0b < 1.5 do
                 if _G.isFlying() then return true end
                 task.wait(0.05)
             end
