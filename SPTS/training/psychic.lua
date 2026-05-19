@@ -109,9 +109,12 @@ end
 local function activateFlyJump(hum, root)
     if _G.isFlying() then setFlyStatus(true); return true end
 
-    -- Must be falling/freefall to trigger fly mode via jump request.
+    -- Must be in freefall for CanFly to be true (set by game's StateChanged).
     if isFalling(hum, root) then
-        -- Use JumpRequest (not Space key) — this is what triggers onJumpRequest in the game.
+        -- Set ToggleFlight so onJumpRequest allows fly activation.
+        if _G.ClientPlrData and _G.ClientPlrData.Settings then
+            _G.ClientPlrData.Settings.ToggleFlight = true
+        end
         pcall(function() UserInputService:JumpRequest() end)
         task.wait(0.5)
         if _G.isFlying() then setFlyStatus(true); return true end
@@ -125,6 +128,9 @@ local function activateFlyJump(hum, root)
     end
 
     if isFalling(hum, root) then
+        if _G.ClientPlrData and _G.ClientPlrData.Settings then
+            _G.ClientPlrData.Settings.ToggleFlight = true
+        end
         pcall(function() UserInputService:JumpRequest() end)
         task.wait(0.5)
         if _G.isFlying() then setFlyStatus(true); return true end
@@ -154,6 +160,12 @@ local function tryEnterFlyMode()
     local chapter = _G.sathScanner.readMainQuestChapterFromUI()
     if not Z.canFlyMeditateFarm(chapter, _G.RawStats) then return false end
 
+    -- ToggleFlight must be true in ClientPlrData for onJumpRequest to activate fly.
+    -- Set it directly on the client — the game reads this local value.
+    if _G.ClientPlrData and _G.ClientPlrData.Settings then
+        _G.ClientPlrData.Settings.ToggleFlight = true
+    end
+
     local char = LP.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
     local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -162,7 +174,7 @@ local function tryEnterFlyMode()
     -- First attempt from current position.
     if activateFlyJump(hum, root) then return true end
 
-    -- If still not flying, teleport to an open spot and try once more.
+    -- Teleport to open air and try once more.
     root.CFrame = CFrame.new(findOpenFlyPosition())
     task.wait(0.4)
     hum  = char:FindFirstChildOfClass("Humanoid")
