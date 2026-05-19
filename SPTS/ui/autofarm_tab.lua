@@ -151,7 +151,7 @@ Toggles["AQ"] = Tabs.Auto:CreateToggle({
 
 Tabs.Auto:CreateSection("Sath Quest")
 
-local SathQuestInfo = Tabs.Auto:CreateLabel("—", 2197020684)
+local SathQuestInfo = Tabs.Auto:CreateLabel("—", "info")
 
 -- Refresh the status line every second.
 task.spawn(function()
