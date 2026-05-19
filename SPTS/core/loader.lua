@@ -160,6 +160,7 @@ UI.Status.Size                = UDim2.new(1, 0, 1, 0)
 UI.Status.TextSize            = 20
 UI.Status.FontFace            = Font.new("rbxasset://fonts/families/SourceSansPro.json", Enum.FontWeight.SemiBold)
 UI.Status.TextColor3          = Color3.fromRGB(158, 158, 158)
+UI.Status.RichText            = true
 UI.Status.Text                = "Initializing..."
 
 -- ── Bubble animation ──────────────────────────────────────────
@@ -224,6 +225,67 @@ TweenService:Create(UI.MainFrame, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enu
     Size = UDim2.new(0.25, 0, 0.2, 0),
 }):Play()
 
+-- ── Rich text helpers ─────────────────────────────────────────
+
+local function rgb(r, g, b) return string.format('rgb(%d,%d,%d)', r, g, b) end
+
+local function colored(text, r, g, b)
+    return string.format('<font color="%s">%s</font>', rgb(r,g,b), text)
+end
+
+-- Pre-built color tags
+local function white(t)  return colored(t, 230, 230, 230) end
+local function gray(t)   return colored(t, 140, 140, 140) end
+local function green(t)  return colored(t, 80,  220, 100) end
+local function red(t)    return colored(t, 255, 90,  90)  end
+local function orange(t) return colored(t, 255, 140, 40)  end
+local function yellow(t) return colored(t, 255, 210, 60)  end
+
+-- Builds a rich status line based on the label string.
+-- Patterns: "✓ X" → green tick, "⚠ X" → yellow warning, plain → gray label + white value
+local function buildStatusText(label)
+    -- exploit_check ok messages
+    if label:sub(1,1) == "✓" or label:find("supported") then
+        local name = label:gsub("✓%s*", ""):gsub("%s*%-%-%s*supported", "")
+        return green("✓ ") .. white(name) .. gray(" — supported")
+
+    -- exploit_check fail messages
+    elseif label:sub(1,1) == "⚠" or label:find("not available") or label:find("NOT") then
+        local name = label:gsub("⚠%s*", ""):gsub("%s*%-%-%s*.*", "")
+        return red("✗ ") .. white(name) .. yellow(" — not available")
+
+    -- ClientPlrData ready
+    elseif label:find("ClientPlrData") and label:find("available") then
+        return green("✓ ") .. white("ClientPlrData") .. gray(" — ready")
+
+    -- ClientPlrData not ready
+    elseif label:find("ClientPlrData") and (label:find("not ready") or label:find("still not")) then
+        return yellow("⚠ ") .. white("ClientPlrData") .. red(" — not ready")
+
+    -- Loading steps like "Module.lua", "Rayfield UI", etc.
+    elseif label:find("%.lua") or label:find("UI") or label:find("loop")
+        or label:find("tab") or label:find("sync") or label:find("def")
+        or label:find("Tool") or label:find("Farm") or label:find("Dialog")
+        or label:find("Scanner") or label:find("Training") or label:find("ESP")
+        or label:find("Window") or label:find("State") or label:find("Service")
+        or label:find("Stats") or label:find("Exploit") or label:find("Quest")
+    then
+        return gray("Loading ") .. orange(label) .. gray("...")
+
+    -- Ready / finish
+    elseif label == "Ready!" then
+        return green("✓ ") .. white("All systems ") .. green("ready!")
+
+    -- Initializing
+    elseif label:find("Initializing") or label:find("modules") then
+        return gray("Initializing") .. white(" SPTS") .. gray("...")
+
+    -- Fallback
+    else
+        return gray(label)
+    end
+end
+
 -- ── Public API ────────────────────────────────────────────────
 
 local TOTAL_STEPS = 18
@@ -233,7 +295,7 @@ local currentStep = 0
 local function setStatus(text)
     TweenService:Create(UI.Status, TweenInfo.new(0.1), { TextTransparency = 1 }):Play()
     task.wait(0.12)
-    UI.Status.Text = text
+    UI.Status.Text = buildStatusText(text)
     TweenService:Create(UI.Status, TweenInfo.new(0.15), { TextTransparency = 0 }):Play()
 end
 
