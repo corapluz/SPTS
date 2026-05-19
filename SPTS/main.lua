@@ -96,17 +96,15 @@ local function dismissIntroGui()
     -- Try every available method to click the button.
     local caps = _G.ExploitCaps or {}
 
-    -- Method 1: firesignal on Activated
+    -- Method 1: firesignal on MouseButton1Click
     if caps.firesignal and firesignal then
-        local ok, sig = pcall(function() return playBtn.Activated end)
-        if ok and sig then pcall(firesignal, sig) end
         local ok2, sig2 = pcall(function() return playBtn.MouseButton1Click end)
         if ok2 and sig2 then pcall(firesignal, sig2) end
     end
 
-    -- Method 2: getconnections + Fire
+    -- Method 2: getconnections + Fire on MouseButton1Click
     if caps.getconnections and getconnections then
-        for _, evName in ipairs({ "Activated", "MouseButton1Click", "MouseButton1Down" }) do
+        for _, evName in ipairs({ "MouseButton1Click", "MouseButton1Down" }) do
             local ok3, sig3 = pcall(function() return playBtn[evName] end)
             if ok3 and sig3 then
                 local ok4, conns = pcall(getconnections, sig3)
@@ -117,17 +115,17 @@ local function dismissIntroGui()
         end
     end
 
-    -- Method 3: VirtualInputManager click at button center
-    if playBtn.AbsoluteSize.X > 0 then
+    -- Method 3: VirtualInputManager click at button center (always attempted)
+    pcall(function()
         local pos  = playBtn.AbsolutePosition
         local size = playBtn.AbsoluteSize
-        pcall(function()
-            local vim = game:GetService("VirtualInputManager")
-            vim:SendMouseButtonEvent(pos.X + size.X * 0.5, pos.Y + size.Y * 0.5, 0, true,  game, 0)
-            task.wait(0.1)
-            vim:SendMouseButtonEvent(pos.X + size.X * 0.5, pos.Y + size.Y * 0.5, 0, false, game, 0)
-        end)
-    end
+        local x = pos.X + size.X * 0.5
+        local y = pos.Y + size.Y * 0.5
+        local vim = game:GetService("VirtualInputManager")
+        vim:SendMouseButtonEvent(x, y, 0, true,  game, 0)
+        task.wait(0.1)
+        vim:SendMouseButtonEvent(x, y, 0, false, game, 0)
+    end)
 
     -- Wait for the GUI to disappear.
     deadline = tick() + 8

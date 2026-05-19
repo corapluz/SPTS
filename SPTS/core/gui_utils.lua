@@ -30,7 +30,6 @@ local function collectGuiSignals(gui)
         local ok, sig = pcall(function() return gui[name] end)
         if ok and sig then table.insert(signals, sig) end
     end
-    if gui:IsA("GuiButton") then tryAdd("Activated") end
     tryAdd("MouseButton1Click")
     tryAdd("MouseButton1Down")
     return signals
