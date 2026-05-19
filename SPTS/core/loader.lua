@@ -164,58 +164,76 @@ UI.Status.RichText            = true
 UI.Status.Text                = "Initializing..."
 
 -- ── Bubble animation ──────────────────────────────────────────
+-- Bubbles travel left→right inside the bar.
+-- Speed and spawn rate scale with bar fill so they feel natural.
+-- Each bubble only moves vertically with a gentle sine wave —
+-- no secondary offset on the image itself to avoid zigzag.
 
-local BUBBLE_SPEED = 0.5
+local function getBarFill()
+    return UI.Bar.Size.X.Scale  -- 0..1
+end
 
 local function spawnBubble()
-    local randomY    = math.random(15, 85) / 100
-    local holder     = Instance.new("Frame")
-    holder.Name                = "BubbleHolder"
+    local fill = getBarFill()
+    if fill <= 0.01 then return end  -- bar too small, skip
+
+    -- Travel time: slower when bar is short, faster when nearly full
+    local travelTime = 0.9 - fill * 0.55  -- 0.9s at 0% → 0.35s at 100%
+    travelTime = math.clamp(travelTime, 0.3, 0.9)
+
+    -- Random vertical lane (keep away from edges)
+    local laneY = math.random(20, 80) / 100
+
+    -- Gentle vertical drift amplitude — small so it looks like floating
+    local amplitude = math.random(2, 4)
+    local freq      = math.random(2, 4)  -- slow sine, no zigzag
+    local phase     = math.random() * math.pi * 2
+
+    local holder = Instance.new("Frame")
+    holder.Name                  = "BubbleHolder"
     holder.BackgroundTransparency = 1
-    holder.Size                = UDim2.new(0, 8, 0, 8)
-    holder.Position            = UDim2.new(0, -20, randomY, -4)
-    holder.Parent              = UI.BubbleFrame
+    holder.Size                  = UDim2.new(0, 7, 0, 7)
+    holder.Position              = UDim2.new(0, -10, laneY, -3)
+    holder.Parent                = UI.BubbleFrame
 
     local bubble = Instance.new("ImageLabel", holder)
     bubble.BackgroundTransparency = 1
-    bubble.BorderSizePixel     = 0
-    bubble.Size                = UDim2.new(0, 8, 0, 8)
-    bubble.Image               = "rbxassetid://3113298346"
+    bubble.BorderSizePixel        = 0
+    bubble.Size                   = UDim2.new(1, 0, 1, 0)
+    bubble.Image                  = "rbxassetid://3113298346"
+    bubble.ImageTransparency      = math.random(0, 30) / 100
 
-    local mainFreq   = math.random(5, 8)
-    local phase      = math.random() * math.pi * 2
-    local fastFreq   = math.pi
-    local tween      = TweenService:Create(holder, TweenInfo.new(BUBBLE_SPEED, Enum.EasingStyle.Linear), {
-        Position = UDim2.new(1, 15, randomY, -4),
-    })
-    tween:Play()
+    -- Horizontal tween — purely linear, no Y change here
+    TweenService:Create(holder, TweenInfo.new(travelTime, Enum.EasingStyle.Linear), {
+        Position = UDim2.new(1, 10, laneY, -3),
+    }):Play()
 
+    -- Vertical drift via RenderStepped — only Y offset, no X touch
     local conn
     local t0 = os.clock()
     conn = RunService.RenderStepped:Connect(function()
         if not holder or not holder.Parent then conn:Disconnect(); return end
         local elapsed = os.clock() - t0
-        local sx = holder.Position.X.Scale
-        local ox = holder.Position.X.Offset
-        local wave  = (ox >= 0 or sx > 0) and math.sin((elapsed * mainFreq) + phase) * 5 or 0
-        local micro = (ox >= 0 or sx > 0) and math.sin(elapsed * fastFreq) * 2 or 0
-        holder.Position  = UDim2.new(sx, ox, randomY, -4 + wave)
-        bubble.Position  = UDim2.new(0, 0, 0, micro)
+        local drift   = math.sin(elapsed * freq + phase) * amplitude
+        -- Keep X from the tween, only override Y
+        local p = holder.Position
+        holder.Position = UDim2.new(p.X.Scale, p.X.Offset, laneY, -3 + drift)
     end)
 
-    Debris:AddItem(holder, BUBBLE_SPEED + 0.1)
+    Debris:AddItem(holder, travelTime + 0.15)
 end
 
-local function getDynamicSpawnRate()
-    local sx = UI.Bar.Size.X.Scale
-    local ox = UI.Bar.Size.X.Offset
-    return (sx >= 0.95 or (sx == 0 and ox > 300)) and 0.02 or 0.09
+-- Spawn rate: fewer bubbles when bar is short, more when nearly full
+local function getSpawnRate()
+    local fill = getBarFill()
+    -- 0.18s at 0% fill → 0.04s at 100% fill
+    return math.clamp(0.18 - fill * 0.14, 0.04, 0.18)
 end
 
 task.spawn(function()
     while UI.ScreenGui and UI.ScreenGui.Parent do
         spawnBubble()
-        task.wait(getDynamicSpawnRate())
+        task.wait(getSpawnRate())
     end
 end)
 
@@ -311,14 +329,27 @@ local function step(label)
     setStatus(label)
 end
 
--- Call when everything is loaded — fills bar to 100% and closes the UI.
+-- Call when everything is loaded — fills bar to 100%, waits for tween,
+-- then closes the UI.
 local function finish()
     currentStep = TOTAL_STEPS
-    TweenService:Create(UI.Bar, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+
+    -- Tween bar to 100%
+    TweenService:Create(UI.Bar, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Size = UDim2.new(1, 0, 1, 0),
     }):Play()
+
     setStatus("Ready!")
-    task.wait(0.8)
+
+    -- Wait until the bar CanvasGroup actually reaches X scale = 1
+    local deadline = tick() + 3
+    while tick() < deadline do
+        if UI.Bar.Size.X.Scale >= 0.99 then break end
+        task.wait(0.05)
+    end
+
+    task.wait(0.5)  -- brief pause so the user sees "Ready!"
+
     TweenService:Create(UI.MainFrame, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Size = UDim2.new(0, 0, 0, 0),
     }):Play()
