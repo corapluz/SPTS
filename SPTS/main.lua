@@ -36,6 +36,10 @@ elseif getexecutorname then
     if ok and name then executorName = tostring(name) end
 end
 
+-- Strip version numbers and extra info — keep only the executor name.
+-- "Solara 3.0" → "Solara", "Xeno 2.1.4 Beta" → "Xeno"
+executorName = executorName:match("^(%a[%a%d]*)") or executorName
+
 _G.ExecutorName = executorName
 
 local execLower = executorName:lower()
