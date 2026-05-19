@@ -22,10 +22,22 @@ _G.ExecutorName = executorName
 -- ── Module loader ─────────────────────────────────────────────
 
 local function load(path)
-    local src = game:HttpGet(BASE .. path)
-    local fn, err = loadstring(src, "@" .. path)
-    assert(fn, "[SPTS] loadstring failed for " .. path .. ": " .. tostring(err))
-    return fn()
+    local src, httpErr = pcall(function() return game:HttpGet(BASE .. path) end)
+    if not src then
+        if _G.Loader then _G.Loader.error("HttpGet failed: " .. path) end
+        error("[SPTS] HttpGet failed for " .. path .. ": " .. tostring(httpErr))
+    end
+    local fn, err = loadstring(httpErr, "@" .. path)
+    if not fn then
+        if _G.Loader then _G.Loader.error("Parse error: " .. path) end
+        error("[SPTS] loadstring failed for " .. path .. ": " .. tostring(err))
+    end
+    local ok2, result = pcall(fn)
+    if not ok2 then
+        if _G.Loader then _G.Loader.error(path .. ": " .. tostring(result):sub(1,50)) end
+        error("[SPTS] runtime error in " .. path .. ": " .. tostring(result))
+    end
+    return result
 end
 
 -- ── Loader UI ─────────────────────────────────────────────────
