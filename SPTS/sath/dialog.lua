@@ -9,15 +9,10 @@ local RepStorage = _G.RepStorage
 -- Finds the ClientRemoteController_Module by searching all LocalScripts
 -- under PlayerScripts, not just the first one.
 local function getCRCModule()
-    for _, ls in ipairs(LP.PlayerScripts:GetChildren()) do
-        if ls:IsA("LocalScript") then
-            local mod = ls:FindFirstChild("ClientRemoteController_Module")
-            if mod then
-                local ok, m = pcall(require, mod)
-                if ok and m then
-                    return m
-                end
-            end
+    for _, obj in ipairs(LP.PlayerScripts:GetDescendants()) do
+        if obj.Name == "ClientRemoteController_Module" and obj:IsA("ModuleScript") then
+            local ok, m = pcall(require, obj)
+            if ok and m then return m end
         end
     end
     return nil
@@ -160,7 +155,14 @@ local function runSathDialog()
     end
 
     print("[SPTS] QuestTalkBtn visible, waiting for tween to settle...")
-    task.wait(0.6)  -- QuestTalkBtn tweens in from top, wait for it to land
+    -- Wait until the button has actually tweened into the visible screen area.
+    -- The button starts at Y ~ -0.2 (off-screen top) and tweens down.
+    -- AbsolutePosition.Y should be > 20 once it has landed.
+    local settleDeadline = tick() + 3
+    while tick() < settleDeadline do
+        if talkBtn.AbsolutePosition.Y > 20 then break end
+        task.wait(0.05)
+    end
     print("[SPTS] Clicking QuestTalkBtn at " .. tostring(talkBtn.AbsolutePosition))
     clickBtn(talkBtn)
     task.wait(0.9)
@@ -221,7 +223,11 @@ local function tryAdvanceSathQuest()
     local talkBtn = sg:FindFirstChild("QuestTalkBtn")
     if talkBtn and talkBtn.Visible then
         print("[SPTS] tryAdvanceSathQuest: talk button already visible, waiting for tween...")
-        task.wait(0.6)
+        local d = tick() + 3
+        while tick() < d do
+            if talkBtn.AbsolutePosition.Y > 20 then break end
+            task.wait(0.05)
+        end
         return runTalkFlow()
     end
 
@@ -239,7 +245,11 @@ local function tryAdvanceSathQuest()
         talkBtn = sg:FindFirstChild("QuestTalkBtn")
         if talkBtn and talkBtn.Visible then
             print("[SPTS] tryAdvanceSathQuest: talk button appeared, waiting for tween...")
-            task.wait(0.6)
+            local d = tick() + 3
+            while tick() < d do
+                if talkBtn.AbsolutePosition.Y > 20 then break end
+                task.wait(0.05)
+            end
             return runTalkFlow()
         end
 
