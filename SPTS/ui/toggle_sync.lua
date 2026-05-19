@@ -1,14 +1,20 @@
 -- Keeps the Rayfield toggle visuals in sync with _G.Settings.
 -- Also handles locking/unlocking the training UI when Sath mode is active.
 
-local Toggles = _G.Toggles
+-- NOTE: Do NOT cache _G.Toggles into a local at load time.
+-- Toggles are added after this file runs, so we always read _G.Toggles fresh.
 
--- Guard flag: prevents Set() → callback → setToggleVisual → Set() infinite loops.
+-- Guard flag: prevents Set() -> callback -> setToggleVisual -> Set() loops.
 local visualLock = false
+
+local function getToggles()
+    return _G.Toggles
+end
 
 -- Sets a toggle's visual state without triggering its callback.
 _G.setToggleVisual = function(id, value)
     if visualLock then return end
+    local Toggles = getToggles()
     local tog = Toggles and Toggles[id]
     if not tog then return end
 
@@ -20,6 +26,7 @@ end
 -- Pushes the current Settings state to all toggle visuals.
 -- In Sath mode, training toggles are forced off and weight shows the active tier.
 _G.syncFarmToggles = function()
+    local Toggles = getToggles()
     if not Toggles then return end
     if visualLock then return end
 
@@ -32,7 +39,6 @@ _G.syncFarmToggles = function()
         DeathGrinding = "DG",
     }
 
-    -- cascadeLock stops the toggle callbacks from firing side effects.
     _G.cascadeLock = true
     visualLock     = true
 
@@ -59,15 +65,15 @@ _G.syncFarmToggles = function()
     visualLock     = false
     _G.cascadeLock = false
 
-    -- Lock/unlock interactability after visuals are set.
     if _G.setTrainingUiLocked then
         _G.setTrainingUiLocked(_G.Settings.AutoSathQuest)
     end
 end
 
 -- Locks or unlocks the training and weight toggles in the Rayfield UI.
--- Only touches Interactable — does NOT call Set() to avoid re-triggering callbacks.
+-- Only touches interactability — never calls Set() to avoid re-triggering callbacks.
 _G.setTrainingUiLocked = function(locked)
+    local Toggles = getToggles()
     if not Toggles then return end
 
     local function lockGuiTree(root, on)
@@ -80,10 +86,9 @@ _G.setTrainingUiLocked = function(locked)
 
     local function lockOne(tog)
         if not tog then return end
-        -- Use the Rayfield API if available, otherwise fall back to GUI tree walk.
-        if tog.Lock         then pcall(function() tog:Lock(locked)               end) end
+        if tog.Lock          then pcall(function() tog:Lock(locked)               end) end
         if tog.SetInteraction then pcall(function() tog:SetInteraction(not locked) end) end
-        if tog.SetLocked    then pcall(function() tog:SetLocked(locked)          end) end
+        if tog.SetLocked     then pcall(function() tog:SetLocked(locked)          end) end
 
         local root
         for _, key in ipairs({ "Toggle", "ToggleFrame", "Object", "Container", "Frame", "Holder" }) do
