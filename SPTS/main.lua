@@ -40,6 +40,7 @@ _G.doRespawn = function()
 end
 
 load("core/stats.lua")     -- stat sniffer loop
+load("core/exploit_check.lua") -- _G.ExploitCaps + colored F9 console output
 load("core/gui_utils.lua") -- fireGuiSignal, clickGuiCenter, etc. → _G.guiUtils
 
 -- ── Shared toggle table ───────────────────────────────────────
@@ -81,20 +82,54 @@ local function dismissIntroGui()
     local introGui = playerGui:FindFirstChild("IntroGui")
     if not introGui or not introGui.Enabled then return end
 
-    -- Wait for the button text to change from "Loading..." to "SPAWN".
     local playBtn = introGui:FindFirstChild("PlayBtn")
     if not playBtn then return end
 
-    local deadline = tick() + 10
+    -- Wait for the button to be ready ("SPAWN" or "PLAY").
+    local deadline = tick() + 12
     while tick() < deadline do
-        if playBtn.Text == " SPAWN " or playBtn.Text == "PLAY" then break end
+        local t = playBtn.Text
+        if t == " SPAWN " or t == "SPAWN" or t == "PLAY" or t == " PLAY " then break end
         task.wait(0.2)
     end
 
-    -- Click it.
-    _G.guiUtils.fireGuiSignal(playBtn)
+    -- Try every available method to click the button.
+    local caps = _G.ExploitCaps or {}
 
-    -- Wait for the GUI to disappear before resuming farm logic.
+    -- Method 1: firesignal on Activated
+    if caps.firesignal and firesignal then
+        local ok, sig = pcall(function() return playBtn.Activated end)
+        if ok and sig then pcall(firesignal, sig) end
+        local ok2, sig2 = pcall(function() return playBtn.MouseButton1Click end)
+        if ok2 and sig2 then pcall(firesignal, sig2) end
+    end
+
+    -- Method 2: getconnections + Fire
+    if caps.getconnections and getconnections then
+        for _, evName in ipairs({ "Activated", "MouseButton1Click", "MouseButton1Down" }) do
+            local ok3, sig3 = pcall(function() return playBtn[evName] end)
+            if ok3 and sig3 then
+                local ok4, conns = pcall(getconnections, sig3)
+                if ok4 and conns then
+                    for _, c in ipairs(conns) do pcall(function() c:Fire() end) end
+                end
+            end
+        end
+    end
+
+    -- Method 3: VirtualInputManager click at button center
+    if playBtn.AbsoluteSize.X > 0 then
+        local pos  = playBtn.AbsolutePosition
+        local size = playBtn.AbsoluteSize
+        pcall(function()
+            local vim = game:GetService("VirtualInputManager")
+            vim:SendMouseButtonEvent(pos.X + size.X * 0.5, pos.Y + size.Y * 0.5, 0, true,  game, 0)
+            task.wait(0.1)
+            vim:SendMouseButtonEvent(pos.X + size.X * 0.5, pos.Y + size.Y * 0.5, 0, false, game, 0)
+        end)
+    end
+
+    -- Wait for the GUI to disappear.
     deadline = tick() + 8
     while tick() < deadline and introGui.Enabled do
         task.wait(0.2)
