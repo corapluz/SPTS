@@ -1,25 +1,25 @@
 -- Fist Strength training loop.
--- Handles starter (Push Up), Rock Zone, and Crystal/Star zones depending
--- on the current chapter. Uses Module.lua's fsTrainingMode to decide.
+-- starter mode (quest 1-2): fire Add_FS_Request in place, no teleport.
+-- rock mode (quest 3+): teleport to Rock Zone + equip Fist Training tool.
+-- zone mode (quest 9+): teleport to Crystal/Star zones.
 
 local Z      = _G.Z
 local Remote = _G.Remote
 
--- Fires the server-side FS increment at a high rate when in a zone.
--- Skipped during Sath dialog and in starter mode (tool activation handles that).
+-- Fires Add_FS_Request every 0.05 s regardless of mode.
+-- In starter mode there's no zone to teleport to, but the remote still works.
 task.spawn(function()
     while true do
         if _G.Settings.FistStrength and not _G.sathAutofarmBlocked() then
-            local chapter = _G.sathScanner.readMainQuestChapterFromUI()
-            if Z.fsTrainingMode(chapter) ~= "starter" then
-                Remote:FireServer({ [1] = "Add_FS_Request" })
-            end
+            Remote:FireServer({ [1] = "Add_FS_Request" })
         end
         task.wait(0.05)
     end
 end)
 
--- Tool equip loop: runs at 0.35 s and picks the right tool for the current mode.
+-- Equips the right tool depending on the current chapter.
+-- Starter: nothing to equip (Push Up is for BT, not FS).
+-- Rock / zone: equip Fist Training tool.
 task.spawn(function()
     while true do
         if _G.sathAutofarmBlocked() then
@@ -31,20 +31,18 @@ task.spawn(function()
             local chapter = _G.sathScanner.readMainQuestChapterFromUI()
             local fsMode  = Z.fsTrainingMode(chapter)
 
-            if fsMode == "starter" then
-                -- Below Rock chapter — just use Push Up.
-                _G.useStarterTraining("FistStrength")
-            elseif fsMode == "rock" or fsMode == "zone" then
-                -- Rock / Crystal / Star zones — equip the Fist Training tool.
+            if fsMode == "rock" or fsMode == "zone" then
                 _G.equipZoneTool(Z.ZONE_TOOLS.FistStrength)
             end
+            -- starter mode: no tool needed, Add_FS_Request handles it above.
         end
 
         task.wait(0.35)
     end
 end)
 
--- Teleport loop: keeps the character at the right FS zone position.
+-- Teleport loop: only active in rock/zone mode.
+-- In starter mode the player stays in place.
 task.spawn(function()
     while true do
         if _G.sathAutofarmBlocked() then
@@ -54,17 +52,21 @@ task.spawn(function()
 
         if _G.Settings.FistStrength then
             local chapter = _G.sathScanner.readMainQuestChapterFromUI()
-            local target  = Z.farmTarget(
-                { BodyToughness = false, FistStrength = true, PsychicPower = false },
-                _G.RawStats,
-                chapter
-            )
+            local fsMode  = Z.fsTrainingMode(chapter)
 
-            if target then
-                local char = _G.LP.Character
-                local root = char and char:FindFirstChild("HumanoidRootPart")
-                if root and (root.Position - target).Magnitude > 8 then
-                    root.CFrame = CFrame.new(target)
+            -- Don't teleport in starter mode — rock zone isn't unlocked yet.
+            if fsMode ~= "starter" then
+                local target = Z.farmTarget(
+                    { BodyToughness = false, FistStrength = true, PsychicPower = false },
+                    _G.RawStats,
+                    chapter
+                )
+                if target then
+                    local char = _G.LP.Character
+                    local root = char and char:FindFirstChild("HumanoidRootPart")
+                    if root and (root.Position - target).Magnitude > 8 then
+                        root.CFrame = CFrame.new(target)
+                    end
                 end
             end
         end
