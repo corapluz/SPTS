@@ -32,8 +32,8 @@ M.FS_CHAPTER_CRYSTAL = 10 -- quest 9 done → Crystal+ (10/13+)
 M.PP_FLY_CHAPTER     = 10 -- quest 9 done → fly + meditate 10x PP (UI 10/13+)
 M.PP_FLY_MIN_JF      = 10000
 M.PP_FLY_MIN_PP      = 50
-M.BT_DEATH_GRIND_MIN = 20
-M.BT_ZONE_MIN        = 20
+M.BT_DEATH_GRIND_MIN = 5   -- Ice Bath min; death grinding works from BT 5+
+M.BT_ZONE_MIN        = 20  -- normal BT farm zone threshold (survive there)
 
 M.STARTER_TOOLS = {
     FistStrength  = { "Push Up" },
@@ -57,7 +57,6 @@ M.BT = {
     { req = 0,    min = 0,   name = "Safe Zone",               p1 = Vector3.new(420, 249, 878) },
 }
 
--- Crystal listed before Rock so smartTarget picks Crystal when both req=0
 M.FS = {
     { req = 1e13, name = "Red Star (10T+)",    p1 = Vector3.new(-367, 15735, -11) },
     { req = 1e11, name = "Green Star (100B+)", p1 = Vector3.new(1380, 9274, 1648) },

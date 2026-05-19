@@ -1,7 +1,13 @@
 -- Psychic Power training loop.
--- Low chapter / low stats: equip Meditate tool on the ground.
--- High chapter (10+) with enough JF and PP: fly + meditate for faster gains.
--- Uses Module.lua's canFlyMeditateFarm to decide which mode to use.
+--
+-- Three modes depending on chapter and stats:
+--   ground      — always works: teleport to PP zone, equip Meditate tool, stay put.
+--   fly+meditate — quest 9 done (chapter 10+), JF >= 10K, PP >= 50:
+--                  enter fly mode then equip Meditate for 10x gains.
+--   high zone   — PP >= 1M: just stand in the 1M+ area with Meditate equipped.
+--
+-- Remote events are NOT used for PP — only the Meditate tool matters.
+-- The tool must stay equipped; unequipping it stops the gain.
 
 local Z              = _G.Z
 local LP             = _G.LP
@@ -10,7 +16,7 @@ local UserInputService = _G.UserInputService
 
 local flyStatusSynced = false
 
--- ── Fly state helpers ─────────────────────────────────────────
+-- ── Fly helpers ───────────────────────────────────────────────
 
 local function setFlyStatus(on)
     flyStatusSynced = on == true
@@ -43,8 +49,6 @@ local function waitUntilMeditateGone(maxSec)
     return not _G.hasMeditateEquipped()
 end
 
--- ── Input helpers ─────────────────────────────────────────────
-
 local function pressSpace()
     pcall(function()
         local vim = game:GetService("VirtualInputManager")
@@ -58,19 +62,13 @@ local function doPhysicalJump()
     pcall(function() UserInputService:JumpRequest() end)
 end
 
--- ── Fly entry logic ───────────────────────────────────────────
-
 local function isOnGround(hum)
     return hum.FloorMaterial ~= Enum.Material.Air
 end
 
 local function isFalling(hum, root)
-    local st = hum:GetState()
-    if st == Enum.HumanoidStateType.Freefall then return true end
-    if root then
-        local vy = root.AssemblyLinearVelocity.Y
-        if vy < -1.5 then return true end
-    end
+    if hum:GetState() == Enum.HumanoidStateType.Freefall then return true end
+    if root and root.AssemblyLinearVelocity.Y < -1.5 then return true end
     return false
 end
 
@@ -83,7 +81,6 @@ local function waitUntilFalling(hum, root, maxSec)
     return isFalling(hum, root)
 end
 
--- Finds a clear spot above the character to jump from without hitting a ceiling.
 local function findOpenFlyPosition()
     local char     = LP.Character
     local root     = char and char:FindFirstChild("HumanoidRootPart")
@@ -94,24 +91,21 @@ local function findOpenFlyPosition()
     params.FilterType = Enum.RaycastFilterType.Exclude
     params.FilterDescendantsInstances = { char }
 
-    local offsets = {
+    for _, off in ipairs({
         Vector3.zero,
-        Vector3.new( 25, 0,  0),
-        Vector3.new(-25, 0,  0),
-        Vector3.new(  0, 0, 25),
-        Vector3.new(  0, 0,-25),
-    }
-
-    for _, off in ipairs(offsets) do
+        Vector3.new( 25,0,0), Vector3.new(-25,0,0),
+        Vector3.new(0,0, 25), Vector3.new(0,0,-25),
+    }) do
         local base = root.Position + off
         for lift = 35, 100, 15 do
-            local pos        = Vector3.new(base.X, base.Y + lift, base.Z)
-            local clearAbove = not workspace:Raycast(pos, Vector3.new(0, 20, 0), params)
-            local clearHead  = not workspace:Raycast(pos + Vector3.new(0, 2, 0), Vector3.new(0, 8, 0), params)
-            if clearAbove and clearHead then return pos end
+            local pos = Vector3.new(base.X, base.Y + lift, base.Z)
+            if not workspace:Raycast(pos, Vector3.new(0,20,0), params)
+            and not workspace:Raycast(pos + Vector3.new(0,2,0), Vector3.new(0,8,0), params)
+            then
+                return pos
+            end
         end
     end
-
     return fallback
 end
 
@@ -119,42 +113,31 @@ local function activateFlyJump(hum, root)
     if _G.isFlying() then setFlyStatus(true); return true end
 
     if isFalling(hum, root) then
-        pressSpace()
-        task.wait(0.4)
+        pressSpace(); task.wait(0.4)
         if _G.isFlying() then setFlyStatus(true); return true end
         return false
     end
 
     if isOnGround(hum) then
-        doPhysicalJump()
-        task.wait(0.12)
+        doPhysicalJump(); task.wait(0.12)
         waitUntilFalling(hum, root, 1.2)
     end
 
     if isFalling(hum, root) then
-        pressSpace()
-        task.wait(0.4)
+        pressSpace(); task.wait(0.4)
         if _G.isFlying() then setFlyStatus(true); return true end
     end
-
     return false
 end
 
--- Stops flying and unequips the Meditate tool.
 _G.stopFlyMode = function()
     if not _G.isFlying() and not _G.hasMeditateEquipped() then
         flyStatusSynced = false
         return
     end
-
     unequipMeditateTool()
     waitUntilMeditateGone(2)
-
-    if _G.isFlying() then
-        pressSpace()
-        task.wait(0.25)
-    end
-
+    if _G.isFlying() then pressSpace(); task.wait(0.25) end
     setFlyStatus(false)
     _G.Flying = false
 end
@@ -174,7 +157,6 @@ local function tryEnterFlyMode()
 
     if activateFlyJump(hum, root) then return true end
 
-    -- Couldn't get airborne from current position — try a clear spot nearby.
     root.CFrame = CFrame.new(findOpenFlyPosition())
     task.wait(0.3)
     hum  = char:FindFirstChildOfClass("Humanoid")
@@ -183,16 +165,19 @@ local function tryEnterFlyMode()
         waitUntilFalling(hum, root, 1.5)
         activateFlyJump(hum, root)
     end
-
     return _G.isFlying()
 end
 
+-- ── Meditate tool equip ───────────────────────────────────────
+
+-- Equips the Meditate tool. In fly mode we need to be airborne first.
+-- On the ground (high PP zone or pre-fly) we just equip directly.
 local function equipMeditateTool()
-    if _G.sathAutofarmBlocked() or not _G.isFlying() then return end
+    if _G.sathAutofarmBlocked() then return end
     local char = LP.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
     if not char or not hum or hum.Health <= 0 then return end
-    if char:FindFirstChild("Meditate") then return end
+    if char:FindFirstChild("Meditate") then return end  -- already equipped
     local tool = LP.Backpack:FindFirstChild("Meditate")
     if tool then hum:EquipTool(tool) end
 end
@@ -202,7 +187,6 @@ end
 task.spawn(function()
     while true do
         if _G.sathAutofarmBlocked() then
-            -- Stop flying if PP isn't active so we don't float around doing nothing.
             if not _G.Settings.PsychicPower then
                 _G.stopFlyMode()
                 _G.unequipAllTools()
@@ -232,11 +216,13 @@ task.spawn(function()
             end
 
             if useFly then
+                -- Quest 9 done + enough JF/PP: fly and meditate for 10x gains.
                 _G.ppUseFlyMode = true
                 if tryEnterFlyMode() and _G.isFlying() then
                     equipMeditateTool()
                 end
             else
+                -- Ground mode: just keep Meditate equipped in the right zone.
                 if _G.ppUseFlyMode then
                     _G.stopFlyMode()
                     _G.ppUseFlyMode = false

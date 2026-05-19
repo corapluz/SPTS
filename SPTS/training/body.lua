@@ -1,18 +1,71 @@
 -- Body Toughness training loop.
--- Below BT 20: Push Up tool + remote BT increment.
--- BT 20+: death grinding (teleport to damage zone, respawn on death).
+--
+-- Two modes:
+--   pushup      — BT < 20: equip Push Up, click screen, fire +BT1 remote.
+--   deathgrind  — BT >= 20: teleport to a damage zone and respawn on death.
+--
+-- Zone selection rules (from Module.lua M.BT table):
+--   Normal BT farm  → needs bt >= zone.req  (you survive there)
+--   Death Grinding  → needs bt >= zone.min  (you die there, that's the point)
+--
+-- Death Grinding toggle works standalone too — it just needs BT >= 5 (Ice Bath min).
 
 local Z      = _G.Z
 local LP     = _G.LP
 local Remote = _G.Remote
 
+local BT_DEATH_GRIND_ABSOLUTE_MIN = 5  -- Ice Bath min from Module.lua
+
 local lastPushUpBt = 0
 
--- Fires the Push Up tool and sends the BT increment remote at most once per second.
+-- ── Zone pickers ──────────────────────────────────────────────
+
+-- Best zone where bt >= zone.req (normal farm — you survive).
+local function normalBtTarget(bt)
+    for _, zone in ipairs(Z.BT) do
+        if bt >= zone.req and zone.req > 0 then
+            return Z.midPos(zone.p1, zone.p2)
+        end
+    end
+    return nil
+end
+
+-- Best zone where bt >= zone.min (death grind — you die there).
+local function deathGrindTarget(bt)
+    for _, zone in ipairs(Z.BT) do
+        if bt >= zone.min and zone.min > 0 then
+            return Z.midPos(zone.p1, zone.p2)
+        end
+    end
+    return nil
+end
+
+-- ── State checks ──────────────────────────────────────────────
+
+local function canDeathGrind()
+    return (_G.RawStats.BT or 0) >= BT_DEATH_GRIND_ABSOLUTE_MIN
+end
+
+-- True when death grinding should be active (standalone toggle or Sath BT phase).
+local function deathGrindActive()
+    if _G.Settings.DeathGrinding and canDeathGrind() then return true end
+    if _G.sathAllowsToolFarm("BodyToughness")
+        and Z.btTrainingMode(_G.RawStats.BT) == "deathgrind"
+    then return true end
+    return false
+end
+
+local function shouldRespawnForBtFarm()
+    if _G.Settings.InstantRespawn then return true end
+    if deathGrindActive() then return true end
+    return false
+end
+
+-- ── Push Up ───────────────────────────────────────────────────
+
 local function usePushUpBodyToughness()
     _G.useStarterTraining("BodyToughness")
 
-    -- Click the screen so the tool animation plays.
     local cam = workspace.CurrentCamera
     if cam then
         local vp = cam.ViewportSize
@@ -31,32 +84,29 @@ local function usePushUpBodyToughness()
     end
 end
 
--- Returns true when BT is high enough to use death grinding instead of Push Up.
-local function shouldBtDeathGrindFarm()
-    return _G.sathAllowsToolFarm("BodyToughness")
-        and Z.btTrainingMode(_G.RawStats.BT) == "deathgrind"
-end
+-- ── Teleport loop ─────────────────────────────────────────────
 
--- Returns true when the respawn loop should be active.
-local function shouldRespawnForBtFarm()
-    if _G.Settings.InstantRespawn then return true end
-    if _G.Settings.DeathGrinding and Z.canDeathGrind(_G.RawStats.BT) then return true end
-    if shouldBtDeathGrindFarm() then return true end
-    return false
-end
-
--- Teleport loop: keeps the character in the right BT damage zone.
 task.spawn(function()
     while true do
-        if _G.sathAutofarmBlocked() then
-            task.wait(0.15)
-            continue
-        end
+        if _G.sathAutofarmBlocked() then task.wait(0.15); continue end
 
-        if (_G.Settings.DeathGrinding and Z.canDeathGrind(_G.RawStats.BT))
-            or shouldBtDeathGrindFarm()
+        local bt = _G.RawStats.BT or 0
+
+        if deathGrindActive() then
+            -- Death grind: go to the hardest zone we can die in.
+            local target = deathGrindTarget(bt)
+            if target then
+                local char = LP.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root and (root.Position - target).Magnitude > 8 then
+                    root.CFrame = CFrame.new(target)
+                end
+            end
+        elseif _G.sathAllowsToolFarm("BodyToughness")
+            and Z.btTrainingMode(bt) ~= "pushup"
         then
-            local target = Z.deathGrindTarget(_G.RawStats)
+            -- Normal BT farm: go to the best zone we can survive in.
+            local target = normalBtTarget(bt)
             if target then
                 local char = LP.Character
                 local root = char and char:FindFirstChild("HumanoidRootPart")
@@ -70,13 +120,11 @@ task.spawn(function()
     end
 end)
 
--- Tool loop: runs Push Up when BT is still in pushup mode.
+-- ── Push Up loop ──────────────────────────────────────────────
+
 task.spawn(function()
     while true do
-        if _G.sathAutofarmBlocked() then
-            task.wait(0.15)
-            continue
-        end
+        if _G.sathAutofarmBlocked() then task.wait(0.15); continue end
 
         if _G.sathAllowsToolFarm("BodyToughness")
             and Z.btTrainingMode(_G.RawStats.BT) == "pushup"
@@ -88,7 +136,8 @@ task.spawn(function()
     end
 end)
 
--- Character event binding: triggers respawn when health hits zero.
+-- ── Character events ──────────────────────────────────────────
+
 local function bindCharacterEvents(char)
     local hum = char:WaitForChild("Humanoid", 8)
     if not hum then return end
@@ -116,7 +165,6 @@ local function bindCharacterEvents(char)
     end)
 end
 
--- Store in _G so main.lua can wire up CharacterAdded.
 _G.bodyModule = {
     bindCharacterEvents    = bindCharacterEvents,
     shouldRespawnForBtFarm = shouldRespawnForBtFarm,
