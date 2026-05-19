@@ -23,10 +23,12 @@ local function loadBar(label)
     local bar    = "[" .. string.rep("=", filled) .. string.rep(" ", empty) .. "]"
     local pct    = math.floor((loadStep / LOAD_STEPS) * 100)
     local line   = string.format("[SPTS] %s %d%%  %s", bar, pct, label)
-    if loadStep >= LOAD_STEPS then
-        _G.cprintGreen and _G.cprintGreen(line) or print(line)
+    if loadStep >= LOAD_STEPS and _G.cprintGreen then
+        _G.cprintGreen(line)
+    elseif _G.cprintGray then
+        _G.cprintGray(line)
     else
-        _G.cprintGray  and _G.cprintGray(line)  or print(line)
+        print(line)
     end
 end
 
@@ -49,7 +51,7 @@ _G.ExecutorName = executorName
 
 local execLower = executorName:lower()
 if execLower:find("solara") or execLower:find("xeno") then
-    cprint("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
+    print("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
 end
 
 -- ── Module loader ─────────────────────────────────────────────
@@ -63,9 +65,9 @@ end
 
 -- ── Boot sequence ─────────────────────────────────────────────
 
-cinfo("[SPTS] ── Starting SPTS ──────────────────────────")
+print("[SPTS] ── Starting SPTS ──────────────────────────")
 
-_G.Z = load("Module.lua");    loadBar("Module.lua")
+_G.Z = load("Module.lua");     loadBar("Module.lua")
 
 getgenv().RAYFIELD_ASSET_ID = 10804731440
 _G.Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
@@ -73,12 +75,20 @@ loadBar("Rayfield UI")
 
 load("core/state.lua");        loadBar("State")
 load("core/services.lua");     loadBar("Services")
-load("core/console.lua")       -- RichText colored print
+load("core/console.lua")       -- RichText colored print — must be before exploit_check
 
--- Redefine helpers to use colors now that console.lua is loaded.
-cprint = function(msg) _G.cprintGreen(msg) end
-cwarn  = function(msg) _G.cprintRed(msg)   end
-cinfo  = function(msg) _G.cprintGray(msg)  end
+-- Redefine helpers to use RichText colors now that console.lua is loaded.
+cprint = function(msg) _G.cprintGreen(msg)  end
+cwarn  = function(msg) _G.cprintRed(msg)    end
+cinfo  = function(msg) _G.cprintGray(msg)   end
+
+-- Re-print executor detection with color now that console is ready.
+do
+    local execLower = executorName:lower()
+    if execLower:find("solara") or execLower:find("xeno") then
+        cprint("[SPTS] " .. executorName .. " detected — loading VirtualInput mode")
+    end
+end
 
 local LP              = _G.LP
 local RESPAWN_PAYLOAD = { [1] = "Respawn" }
