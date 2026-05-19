@@ -112,19 +112,24 @@ end
 local function activateFlyJump(hum, root)
     if _G.isFlying() then setFlyStatus(true); return true end
 
+    -- Must be falling/freefall to trigger fly mode via jump request.
     if isFalling(hum, root) then
-        pressSpace(); task.wait(0.4)
+        -- Use JumpRequest (not Space key) — this is what triggers onJumpRequest in the game.
+        pcall(function() UserInputService:JumpRequest() end)
+        task.wait(0.5)
         if _G.isFlying() then setFlyStatus(true); return true end
         return false
     end
 
     if isOnGround(hum) then
-        doPhysicalJump(); task.wait(0.12)
-        waitUntilFalling(hum, root, 1.2)
+        doPhysicalJump()
+        task.wait(0.15)
+        waitUntilFalling(hum, root, 1.5)
     end
 
     if isFalling(hum, root) then
-        pressSpace(); task.wait(0.4)
+        pcall(function() UserInputService:JumpRequest() end)
+        task.wait(0.5)
         if _G.isFlying() then setFlyStatus(true); return true end
     end
     return false
@@ -148,23 +153,28 @@ local function tryEnterFlyMode()
     local chapter = _G.sathScanner.readMainQuestChapterFromUI()
     if not Z.canFlyMeditateFarm(chapter, _G.RawStats) then return false end
 
+    -- Enable flight setting on the server and wait for it to propagate.
     pcall(function() Remote:FireServer({ "Setting", "ToggleFlight", true }) end)
+    task.wait(0.3)
 
     local char = LP.Character
     local hum  = char and char:FindFirstChildOfClass("Humanoid")
     local root = char and char:FindFirstChild("HumanoidRootPart")
     if not hum or not root or hum.Health <= 0 then return false end
 
+    -- First attempt from current position.
     if activateFlyJump(hum, root) then return true end
 
+    -- If still not flying, teleport to an open spot and try once more.
     root.CFrame = CFrame.new(findOpenFlyPosition())
-    task.wait(0.3)
+    task.wait(0.4)
     hum  = char:FindFirstChildOfClass("Humanoid")
     root = char and char:FindFirstChild("HumanoidRootPart")
     if hum and root then
-        waitUntilFalling(hum, root, 1.5)
+        waitUntilFalling(hum, root, 2)
         activateFlyJump(hum, root)
     end
+
     return _G.isFlying()
 end
 
@@ -218,8 +228,12 @@ task.spawn(function()
             if useFly then
                 -- Quest 9 done + enough JF/PP: fly and meditate for 10x gains.
                 _G.ppUseFlyMode = true
-                if tryEnterFlyMode() and _G.isFlying() then
+                local flying = _G.isFlying() or tryEnterFlyMode()
+                if flying and _G.isFlying() then
                     equipMeditateTool()
+                else
+                    -- Not flying yet — wait before retrying to avoid spam loop.
+                    task.wait(1.5)
                 end
             else
                 -- Ground mode: just keep Meditate equipped in the right zone.
