@@ -68,9 +68,18 @@ local function teleportToSath()
 end
 
 -- Clicks a button using VirtualInputManager at its center.
+-- Temporarily raises ZIndex so nothing blocks the click.
 local function clickBtnVIM(btn)
     if not btn then return end
     pcall(function()
+        local sg = btn:FindFirstAncestorOfClass("ScreenGui")
+        local oldBtnZ = btn.ZIndex
+        local oldSgZ  = sg and sg.ZIndexBehavior
+
+        -- Bring button to front so nothing intercepts the click
+        btn.ZIndex = 9999
+        if sg then sg.ZIndexBehavior = Enum.ZIndexBehavior.Global end
+
         local pos   = btn.AbsolutePosition
         local size  = btn.AbsoluteSize
         local inset = game:GetService("GuiService"):GetGuiInset()
@@ -80,33 +89,52 @@ local function clickBtnVIM(btn)
         vim:SendMouseButtonEvent(x, y, 0, true,  game, 0)
         task.wait(0.1)
         vim:SendMouseButtonEvent(x, y, 0, false, game, 0)
+
+        -- Restore original ZIndex after click
+        task.wait(0.05)
+        btn.ZIndex = oldBtnZ
+        if sg and oldSgZ then sg.ZIndexBehavior = oldSgZ end
     end)
 end
 
--- Fires a button — tries firesignal first, then getconnections, then VIM.
--- Stops at the first method that works so we don't double-click.
+-- Presses Space via VirtualInputManager to advance dialog pages.
+local function pressSpaceVIM()
+    pcall(function()
+        local vim = game:GetService("VirtualInputManager")
+        vim:SendKeyEvent(true,  Enum.KeyCode.Space, false, game)
+        task.wait(0.05)
+        vim:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    end)
+end
+
+-- Fires a button: firesignal(Activated) → getconnections(Activated) → VIM click.
 local function clickBtn(btn)
     if not btn then return end
     local caps = _G.ExploitCaps or {}
 
+    -- Method 1: firesignal on Activated
     if caps.firesignal and firesignal then
-        local ok, sig = pcall(function() return btn.MouseButton1Click end)
+        local ok, sig = pcall(function() return btn.Activated end)
         if ok and sig then
             if pcall(firesignal, sig) then return end
         end
     end
 
+    -- Method 2: getconnections on Activated
     if caps.getconnections and getconnections then
-        local ok, sig = pcall(function() return btn.MouseButton1Click end)
+        local ok, sig = pcall(function() return btn.Activated end)
         if ok and sig then
             local ok2, conns = pcall(getconnections, sig)
-            if ok2 and conns and #conns > 0 then
-                for _, c in ipairs(conns) do pcall(function() c:Fire() end) end
+            if ok2 and conns then
+                for _, c in pairs(conns) do
+                    if c.Enabled then pcall(function() c:Fire() end) end
+                end
                 return
             end
         end
     end
 
+    -- Method 3: VIM click with ZIndex boost
     clickBtnVIM(btn)
 end
 
@@ -196,6 +224,8 @@ local function runSathDialog()
         if not msgFrame.Visible then break end
         if page and page.Value == 0 then break end
         if btn then clickBtn(btn) end
+        -- Also press Space — works as a dialog advance on its own
+        pressSpaceVIM()
         task.wait(0.15)
     end
 
