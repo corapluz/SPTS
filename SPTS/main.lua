@@ -4,12 +4,12 @@
 local BASE = "https://raw.githubusercontent.com/corapluz/SPTS/refs/heads/main/SPTS/"
 
 -- ── Console helpers ───────────────────────────────────────────
--- Roblox F9 doesn't support ANSI colors, but warn() = yellow, print() = white.
--- We prefix with colored tags using Unicode blocks for visual separation.
-
-local function cprint(msg)  print("\27[32m" .. msg .. "\27[0m") end  -- green (some executors support ANSI)
-local function cwarn(msg)   warn(msg) end                             -- yellow via warn()
-local function cinfo(msg)   print(msg) end                            -- white
+-- Loaded before everything else so all modules can use colored output.
+-- _G.cprint, _G.cprintGreen etc. are defined in core/console.lua.
+-- For now use plain print until console.lua is loaded.
+local function cprint(msg)  print(msg) end
+local function cwarn(msg)   warn(msg)  end
+local function cinfo(msg)   print(msg) end
 
 -- Loading bar: prints ONE line per step, no spam.
 -- steps = total number of steps, current = which step just finished.
@@ -22,7 +22,12 @@ local function loadBar(label)
     local empty  = 10 - filled
     local bar    = "[" .. string.rep("=", filled) .. string.rep(" ", empty) .. "]"
     local pct    = math.floor((loadStep / LOAD_STEPS) * 100)
-    cinfo(string.format("[SPTS] %s %d%%  %s", bar, pct, label))
+    local line   = string.format("[SPTS] %s %d%%  %s", bar, pct, label)
+    if loadStep >= LOAD_STEPS then
+        _G.cprintGreen and _G.cprintGreen(line) or print(line)
+    else
+        _G.cprintGray  and _G.cprintGray(line)  or print(line)
+    end
 end
 
 -- ── Executor detection ────────────────────────────────────────
@@ -68,8 +73,13 @@ loadBar("Rayfield UI")
 
 load("core/state.lua");        loadBar("State")
 load("core/services.lua");     loadBar("Services")
+load("core/console.lua")       -- RichText colored print
 
-local Remote          = _G.Remote
+-- Redefine helpers to use colors now that console.lua is loaded.
+cprint = function(msg) _G.cprintGreen(msg) end
+cwarn  = function(msg) _G.cprintRed(msg)   end
+cinfo  = function(msg) _G.cprintGray(msg)  end
+
 local LP              = _G.LP
 local RESPAWN_PAYLOAD = { [1] = "Respawn" }
 local savedRespawnPos = nil
